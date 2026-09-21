@@ -297,6 +297,12 @@ Details that matter:
 - **The card is `position: fixed` and anchors to nothing.** Injecting into
   kintone's own markup would mean matching its class names, which move between
   versions.
+- **Top frame only.** The content script runs with `all_frames: true` because
+  the font features need it, but kintone's portal embeds portlets in iframes —
+  and a fixed-position card inside an iframe anchors to *that* iframe's
+  viewport, so the portal drew one card per frame. Guarded with
+  `window.self === window.top`; comparing the references is safe cross-origin
+  even though reading through them is not.
 - Responses are held in memory for five minutes and never written to storage.
 
 `src/shared/garoon.ts` holds the parts worth testing on their own: RFC 3339

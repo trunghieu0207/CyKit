@@ -20,6 +20,11 @@ import type { Settings } from '../../shared/types'
  * The card is `position: fixed` and owns no part of kintone's markup. That is
  * deliberate: anchoring into the page would mean matching kintone's class
  * names, which change between versions.
+ *
+ * It renders in the top frame only. The content script runs with
+ * `all_frames: true` — the font features need that — but kintone's portal
+ * embeds its portlets in iframes, and a fixed-position card inside one anchors
+ * to that iframe's own viewport, so every frame drew its own copy.
  */
 
 const ROOT_ID = 'cykit-schedule'
@@ -275,8 +280,10 @@ export function applySchedule(
 ): void {
   settings = all.schedule
   const onKintone = detectProduct(page.hostname, page.pathname) === 'kintone'
+  // Comparing the references is safe cross-origin; reading through them is not.
+  const topFrame = window.self === window.top
 
-  if (!settings.enabled || !onKintone || !document.body) {
+  if (!settings.enabled || !onKintone || !topFrame || !document.body) {
     remove()
     return
   }

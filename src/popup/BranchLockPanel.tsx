@@ -103,7 +103,6 @@ export function BranchLockPanel({ settings, patchBranchLock }: PanelProps) {
           <span>Garoon address</span>
           <input
             type="url"
-            placeholder="https://example.cybozu.com"
             value={lock.origin}
             onChange={(e) => patchBranchLock({ origin: e.target.value.trim().replace(/\/+$/, '') })}
           />
@@ -114,7 +113,6 @@ export function BranchLockPanel({ settings, patchBranchLock }: PanelProps) {
           <input
             type="text"
             inputMode="numeric"
-            placeholder="e.g. 42"
             value={lock.organizationId}
             onChange={(e) => patchBranchLock({ organizationId: e.target.value.trim() })}
           />
@@ -124,7 +122,6 @@ export function BranchLockPanel({ settings, patchBranchLock }: PanelProps) {
           <span>Repositories</span>
           <input
             type="text"
-            placeholder="my-repo, owner/other-repo"
             value={lock.repos}
             onChange={(e) => patchBranchLock({ repos: e.target.value })}
           />
@@ -139,7 +136,6 @@ export function BranchLockPanel({ settings, patchBranchLock }: PanelProps) {
           <span>Branches</span>
           <input
             type="text"
-            placeholder="main, beta"
             value={lock.branches}
             onChange={(e) => patchBranchLock({ branches: e.target.value })}
           />

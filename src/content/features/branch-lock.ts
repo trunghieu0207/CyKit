@@ -90,42 +90,74 @@ function ensureStyle(): void {
   text-transform:none;
   list-style:none;
 }
+
+/*
+ * Shaped after the status rows GitHub already stacks in the merge box — white
+ * ground, hairline border, and the state carried by a round icon badge rather
+ * than by flooding the row with colour. A filled panel read as a bolt-on
+ * sitting next to "This branch has not been deployed"; this reads as another
+ * row of the same list.
+ */
 #${ROOT_ID}{
   display:flex;
-  gap:10px;
-  align-items:flex-start;
-  margin:0 0 12px;
-  padding:12px 14px;
+  gap:16px;
+  align-items:center;
+  margin:0 0 8px;
+  padding:16px;
   border:1px solid var(--borderColor-default, #d1d9e0);
-  border-radius:8px;
-  background:var(--bgColor-default, #fff);
+  border-radius:6px;
+  background:var(--bgColor-default, #ffffff);
   color:var(--fgColor-default, #1f2328);
   font-family:inherit;
   font-size:14px;
   line-height:20px;
 }
-#${ROOT_ID}[data-tone="locked"]{
-  border-color:var(--borderColor-danger-emphasis, #cf222e);
-  background:var(--bgColor-danger-muted, #fff1f0);
+#${ROOT_ID} .cykit-bl-badge{
+  flex:none;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  width:30px;
+  height:30px;
+  border-radius:50%;
+  background:var(--bgColor-neutral-emphasis, #59636e);
+  color:#ffffff;
 }
-#${ROOT_ID}[data-tone="soon"]{
-  border-color:var(--borderColor-attention-emphasis, #9a6700);
-  background:var(--bgColor-attention-muted, #fff8c5);
+#${ROOT_ID}[data-tone="locked"] .cykit-bl-badge{
+  background:var(--bgColor-danger-emphasis, #cf222e);
 }
-#${ROOT_ID}[data-tone="unknown"]{
-  border-style:dashed;
+#${ROOT_ID}[data-tone="soon"] .cykit-bl-badge{
+  background:var(--bgColor-attention-emphasis, #bf8700);
+}
+#${ROOT_ID}[data-tone="open"] .cykit-bl-badge{
+  background:var(--bgColor-success-emphasis, #1f883d);
+}
+#${ROOT_ID}[data-tone="unknown"] .cykit-bl-badge{
+  background:var(--bgColor-default, #fff);
+  border:1px solid var(--borderColor-default, #d1d9e0);
   color:var(--fgColor-muted, #59636e);
 }
-#${ROOT_ID} .cykit-bl-mark{flex:none;font-size:16px;line-height:20px}
+
+/* Locked is the one state that should catch an eye already on its way to the
+   merge button, so it keeps a tint — everything else stays plain. */
+#${ROOT_ID}[data-tone="locked"]{
+  border-color:var(--borderColor-danger-emphasis, #cf222e);
+}
+
 #${ROOT_ID} .cykit-bl-text{flex:1;min-width:0}
-#${ROOT_ID} .cykit-bl-head{display:block;font-weight:600}
+#${ROOT_ID} .cykit-bl-head{
+  display:block;
+  font-size:14px;
+  font-weight:600;
+  line-height:20px;
+}
 #${ROOT_ID}[data-tone="locked"] .cykit-bl-head{color:var(--fgColor-danger, #cf222e)}
 #${ROOT_ID} .cykit-bl-sub{
   display:block;
-  margin-top:2px;
+  margin-top:1px;
   color:var(--fgColor-muted, #59636e);
-  font-size:12px;
-  line-height:16px;
+  font-size:13px;
+  line-height:18px;
 }`
   ;(document.head ?? document.documentElement).appendChild(style)
 }
@@ -187,6 +219,35 @@ function when(d: Date): string {
   })
 }
 
+/**
+ * Octicon-shaped glyphs rather than emoji: an emoji renders in its own colour
+ * and its own metrics, which is exactly what made the row look pasted on.
+ */
+const GLYPHS: Record<Tone, string> = {
+  locked:
+    '<rect x="3.2" y="7.2" width="9.6" height="6.6" rx="1.4"/>' +
+    '<path d="M5.4 7.2V5.2a2.6 2.6 0 0 1 5.2 0v2" fill="none" stroke="currentColor" stroke-width="1.5"/>',
+  soon:
+    '<path d="M8 1.8a6.2 6.2 0 1 0 0 12.4A6.2 6.2 0 0 0 8 1.8Zm0 1.6a4.6 4.6 0 1 1 0 9.2 4.6 4.6 0 0 1 0-9.2Z"/>' +
+    '<path d="M7.25 4.6h1.5v3.7l2.4 1.4-.75 1.3-3.15-1.85V4.6Z"/>',
+  open:
+    '<path d="M8 1.8a6.2 6.2 0 1 0 0 12.4A6.2 6.2 0 0 0 8 1.8Zm3.1 4.4-3.9 4a.8.8 0 0 1-1.15 0L4.9 8.95l1.1-1.15 1 1 3.05-3.15 1.05 1.15Z"/>',
+  unknown:
+    '<path d="M8 1.8a6.2 6.2 0 1 0 0 12.4A6.2 6.2 0 0 0 8 1.8Zm0 1.5a4.7 4.7 0 1 1 0 9.4 4.7 4.7 0 0 1 0-9.4Z"/>' +
+    '<path d="M7.3 10.6h1.4v1.4H7.3v-1.4Zm2.6-4.2c0 1.1-.6 1.5-1.1 1.9-.4.3-.5.5-.5.9v.3H7.1v-.4c0-.9.4-1.4 1-1.8.5-.4.7-.6.7-1 0-.5-.4-.8-.9-.8s-.9.3-1 .9l-1.3-.3c.2-1.1 1-1.9 2.3-1.9 1.2 0 2 .8 2 1.9Z"/>',
+}
+
+function glyph(tone: Tone): SVGSVGElement {
+  const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg')
+  svg.setAttribute('viewBox', '0 0 16 16')
+  svg.setAttribute('width', '16')
+  svg.setAttribute('height', '16')
+  svg.setAttribute('fill', 'currentColor')
+  svg.setAttribute('aria-hidden', 'true')
+  svg.innerHTML = GLYPHS[tone]
+  return svg
+}
+
 function paint(tone: Tone, head: string, sub: string): void {
   ensureStyle()
 
@@ -198,10 +259,10 @@ function paint(tone: Tone, head: string, sub: string): void {
   root.dataset.tone = tone
   root.textContent = ''
 
-  const mark = document.createElement('span')
-  mark.className = 'cykit-bl-mark'
-  mark.textContent = tone === 'locked' ? '🔒' : tone === 'soon' ? '⏳' : tone === 'open' ? '✅' : '❔'
-  root.appendChild(mark)
+  const badge = document.createElement('span')
+  badge.className = 'cykit-bl-badge'
+  badge.appendChild(glyph(tone))
+  root.appendChild(badge)
 
   const text = document.createElement('span')
   text.className = 'cykit-bl-text'

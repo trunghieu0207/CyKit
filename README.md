@@ -364,6 +364,13 @@ Details:
   `.base-ref` remains as a fallback for older GitHub Enterprise.
 - The banner is placed in `[data-testid="mergebox-partial"]`, with a chain of
   fallbacks ending at `main`: appearing somewhere worse beats not appearing.
+- **It is shaped like the status rows GitHub already stacks there** — white
+  ground, hairline border, state carried by a round icon badge rather than by
+  flooding the row with colour, and octicon-shaped glyphs instead of emoji,
+  which render in their own colour and metrics. A filled yellow panel read as
+  a bolt-on next to "This branch has not been deployed"; this reads as another
+  row of the same list. Locked keeps a red border and title, since that one
+  should catch an eye already travelling towards the merge button.
 - **The event's own times are authoritative**, and they are resolved to an
   absolute instant before anything else looks at them. When `dateTime` carries
   a UTC offset it names an instant outright — `19:00+09:00` and `17:00+07:00`

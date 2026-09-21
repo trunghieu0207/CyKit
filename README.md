@@ -270,8 +270,19 @@ github.com.
 
 ## The Schedule feature
 
-`src/content/features/schedule.ts` puts a floating card on `/k/` pages listing
-the signed-in user's Garoon events for the next few days.
+`src/content/features/schedule.ts` puts a floating card on `/k/` pages showing
+the signed-in user's Garoon diary.
+
+**It answers a question rather than listing rows.** A real Garoon day is mostly
+attendance markers — `[Make Up]`, `[Rest all day]`, `[Late]`, `[Go out]` — which
+are all-day entries for the whole team. Counting them gave "9 today" when only
+three were meetings, and what you actually want at a glance was buried in the
+middle. So the card leads with a headline (what is running, or what is next and
+in how long), counts meetings rather than entries, dims what has finished, and
+rolls the all-day markers into one expandable line.
+
+Times update on a 30-second tick; the same timer refetches once the five-minute
+cache expires. Rows link to the event in Garoon.
 
 **Why this needs no new permission.** kintone and Garoon are served from the
 same host, so `GET /g/api/v1/schedule/events` from a content script on a `/k/`
@@ -304,6 +315,12 @@ Details that matter:
   `window.self === window.top`; comparing the references is safe cross-origin
   even though reading through them is not.
 - Responses are held in memory for five minutes and never written to storage.
+- **Event links are constructed, not returned.** The API carries no URL for an
+  event, so rows point at Garoon's long-standing
+  `/g/schedule/view.csp?event=<id>`.
+- **`[start, end)` is half-open.** A meeting ending at 14:00 is over at 14:00 —
+  otherwise the headline keeps advertising a meeting that just finished while
+  the next one is the thing you need.
 
 `src/shared/garoon.ts` holds the parts worth testing on their own: RFC 3339
 with the local offset, day windows, defensive parsing (an event with no usable

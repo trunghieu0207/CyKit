@@ -145,3 +145,78 @@ export function formatDay(date: Date, now: Date, locale?: string): string {
   if (diff === 1) return 'Tomorrow'
   return date.toLocaleDateString(locale, { weekday: 'short', month: 'short', day: 'numeric' })
 }
+
+// --- time awareness -------------------------------------------------------
+//
+// A list of nine things is not an answer. What a glance needs is: is something
+// running right now, and how long until the next one. Everything below turns
+// the raw day buckets into that.
+
+export type EventStatus = 'past' | 'now' | 'future'
+
+/**
+ * Half-open, `[start, end)`: a meeting that ends at 14:00 is over at 14:00, not
+ * still running. Otherwise the headline keeps advertising a meeting that just
+ * finished while the next one is the thing you need.
+ *
+ * An event with no end is a point in time, so it is past once it has started.
+ */
+export function statusOf(event: ScheduleEvent, now: Date): EventStatus {
+  if (event.start > now) return 'future'
+  if (event.end) return event.end > now ? 'now' : 'past'
+  return event.start.getTime() === now.getTime() ? 'now' : 'past'
+}
+
+/**
+ * All-day entries dominate a Garoon calendar — attendance markers for the whole
+ * team land there — so they are kept apart from the meetings that actually
+ * occupy a slot, and counted separately.
+ */
+export function splitDay(day: ScheduleDay): {
+  timed: ScheduleEvent[]
+  allDay: ScheduleEvent[]
+} {
+  return {
+    timed: day.events.filter((e) => !e.isAllDay),
+    allDay: day.events.filter((e) => e.isAllDay),
+  }
+}
+
+export interface Focus {
+  kind: 'now' | 'next' | 'none'
+  event: ScheduleEvent | null
+}
+
+/**
+ * What to put at the top: whatever is running, otherwise whatever is next.
+ * All-day entries are skipped — "all day" answers neither question.
+ */
+export function focusOf(days: ScheduleDay[], now: Date): Focus {
+  const timed = days.flatMap((d) => splitDay(d).timed)
+  const running = timed.find((e) => statusOf(e, now) === 'now')
+  if (running) return { kind: 'now', event: running }
+  const next = timed.find((e) => statusOf(e, now) === 'future')
+  return next ? { kind: 'next', event: next } : { kind: 'none', event: null }
+}
+
+/** "in 12 min", "in 2h 05m", "in 3 days" — coarser the further out it is. */
+export function formatCountdown(now: Date, target: Date): string {
+  const mins = Math.round((target.getTime() - now.getTime()) / 60000)
+  if (mins <= 0) return 'now'
+  if (mins < 60) return `in ${mins} min`
+  const hours = Math.floor(mins / 60)
+  if (hours < 24) {
+    const rest = mins % 60
+    return rest === 0 ? `in ${hours}h` : `in ${hours}h ${String(rest).padStart(2, '0')}m`
+  }
+  const days = Math.round(hours / 24)
+  return days === 1 ? 'tomorrow' : `in ${days} days`
+}
+
+/**
+ * The event detail page. The API returns no link of its own, so this is built
+ * from Garoon's long-standing schedule URL.
+ */
+export function eventUrl(origin: string, id: string): string {
+  return `${origin}/g/schedule/view.csp?event=${encodeURIComponent(id)}`
+}

@@ -6,7 +6,10 @@ kintone, Garoon, and the cybozu.com portal.
 **Feature 1 — Font.** Replaces kintone's default font across the whole UI with a
 bundled, more readable webfont, and scales text size and weight.
 
-**Feature 2 — GitHub.** Adds a Copy button to pull request and issue pages that
+**Feature 2 — Schedule.** Shows your Garoon calendar on kintone pages. Opt-in;
+it is the only feature that contacts a server.
+
+**Feature 3 — GitHub.** Adds a Copy button to pull request and issue pages that
 puts the title, the canonical link, or both on the clipboard.
 
 ## Setup
@@ -265,6 +268,42 @@ what keeps the font override from following the content script onto GitHub.
 `web_accessible_resources` for the fonts is deliberately *not* opened to
 github.com.
 
+## The Schedule feature
+
+`src/content/features/schedule.ts` puts a floating card on `/k/` pages listing
+the signed-in user's Garoon events for the next few days.
+
+**Why this needs no new permission.** kintone and Garoon are served from the
+same host, so `GET /g/api/v1/schedule/events` from a content script on a `/k/`
+page is same-origin: the session cookie rides along, and `host_permissions`
+never enters into it. Moving this to the popup would change that — the popup is
+an extension page, the call becomes cross-origin, and the added permission
+would disable the extension for every existing user until they accepted it.
+
+Details that matter:
+
+- **Session auth, reads only.** Garoon's docs require an `X-Requested-With`
+  header for session-authenticated calls, and a CSRF token *for writes*. This
+  never writes, so no token is needed and none is obtained — which also avoids
+  reaching into the page's JS context from an isolated world.
+- **`target` is omitted deliberately.** The API then defaults to the user
+  running the request, which is exactly "my schedule" and avoids having to
+  discover a user id.
+- **Off by default.** It is the only feature that talks to a server, so an
+  update does not quietly switch it on.
+- **Failure is silent.** Signed out, Garoon not enabled on the host, network
+  down — each returns no card rather than a broken one. Nothing is allowed to
+  throw into someone's kintone page.
+- **The card is `position: fixed` and anchors to nothing.** Injecting into
+  kintone's own markup would mean matching its class names, which move between
+  versions.
+- Responses are held in memory for five minutes and never written to storage.
+
+`src/shared/garoon.ts` holds the parts worth testing on their own: RFC 3339
+with the local offset, day windows, defensive parsing (an event with no usable
+start is dropped, unknown fields ignored), and bucketing into days — including
+the midnight boundary, where 23:59 and 00:01 must land on different days.
+
 ## Layout
 
 ```
@@ -281,6 +320,8 @@ src/popup/panels.ts            sidebar menu registry — one entry per feature
 src/popup/App.tsx              popup shell: sidebar + active panel
 src/popup/FontPanel.tsx        the Font panel
 src/shared/scope.ts            kintone / Garoon / other detection from the path
+src/shared/garoon.ts           schedule API URLs + response shaping, DOM-free
+src/content/features/schedule.ts      Garoon schedule card on kintone
 src/shared/css.ts              stylesheet generation
 src/shared/fonts.ts            font catalogue + fallback stacks
 src/shared/storage.ts          chrome.storage.sync wrapper + defaults

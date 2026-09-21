@@ -1,12 +1,19 @@
 import type { ComponentType } from 'react'
-import type { FontSettings, GithubSettings, Settings } from '../shared/types'
+import type {
+  FontSettings,
+  GithubSettings,
+  ScheduleSettings,
+  Settings,
+} from '../shared/types'
 import { FontPanel } from './FontPanel'
 import { GithubPanel } from './GithubPanel'
+import { SchedulePanel } from './SchedulePanel'
 
 export interface PanelProps {
   settings: Settings
   patchFont: (patch: Partial<FontSettings>) => void
   patchGithub: (patch: Partial<GithubSettings>) => void
+  patchSchedule: (patch: Partial<ScheduleSettings>) => void
 }
 
 export interface PanelEntry {
@@ -39,5 +46,13 @@ export const PANELS: readonly PanelEntry[] = [
     glyph: 'PR',
     isOn: (s) => s.github.enabled,
     Component: GithubPanel,
+  },
+  {
+    id: 'schedule',
+    label: 'Schedule',
+    hint: 'Garoon, on kintone',
+    glyph: '17',
+    isOn: (s) => s.schedule.enabled,
+    Component: SchedulePanel,
   },
 ]

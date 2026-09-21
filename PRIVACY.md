@@ -1,6 +1,6 @@
 # Privacy Policy — CyKit Extension
 
-_Last updated: 2026-08-13_
+_Last updated: 2026-09-21_
 
 **CyKit does not collect, transmit, or sell any data.** It has no analytics, no
 telemetry, no accounts, and no server of its own.
@@ -26,6 +26,18 @@ nothing leaves your browser.
 URL so that it can place them on your clipboard. This happens **only when you
 click the Copy button**, and the text goes only to your clipboard.
 
+**Schedule feature.** This is the one feature that contacts a server, and it
+**starts switched off**; nothing below happens unless you turn it on.
+
+When enabled, on kintone pages it asks your own Garoon for your own upcoming
+events — `GET /g/api/v1/schedule/events` on the same host you are already
+signed in to. It uses the session cookie your browser already holds, so the
+extension never sees or stores a password, and it sends no request to anywhere
+but that Garoon. The events are rendered in a card on the page and held in
+memory for five minutes to avoid re-requesting; they are never written to
+storage and never leave your browser. The feature only reads — it cannot
+create, change or delete anything in Garoon.
+
 ## What is stored
 
 Your feature settings — chosen font, size, weight, and which products each
@@ -39,16 +51,22 @@ You can erase everything by removing the extension.
 
 ## Network
 
-The extension makes no network requests. Fonts are bundled inside the extension
-package and loaded from `chrome-extension://` URLs, so no request is made to
-Google Fonts or any other host while you browse.
+With the Schedule feature **off**, which is how it ships, the extension makes no
+network requests at all. Fonts are bundled inside the package and loaded from
+`chrome-extension://` URLs, so nothing is fetched from Google Fonts or any other
+host while you browse.
+
+With Schedule **on**, the only request it ever makes is to your own Garoon, on
+the same host as the kintone page you are viewing, to read your own schedule.
+There is no server belonging to this extension, no analytics endpoint, and no
+third party involved.
 
 ## Permissions
 
 | Permission | Why |
 | --- | --- |
 | `storage` | Save your feature settings |
-| Host access to the Cybozu domains | Apply the font changes to those pages |
+| Host access to the Cybozu domains | Apply the font changes to those pages, and — if you enable Schedule — read your own Garoon schedule from that same host |
 | Host access to `github.com` | Add the Copy button to pull request and issue pages |
 
 ## Third-party content

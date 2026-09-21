@@ -63,7 +63,16 @@ export interface GithubSettings {
   enabled: boolean
 }
 
+export interface ScheduleSettings {
+  enabled: boolean
+  /** How many days to show, starting today. */
+  days: number
+  /** Whether the floating card is rolled up to its pill. */
+  collapsed: boolean
+}
+
 export interface Settings {
   font: FontSettings
   github: GithubSettings
+  schedule: ScheduleSettings
 }

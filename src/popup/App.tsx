@@ -4,8 +4,14 @@ import {
   onSettingsChanged,
   patchFontSettings,
   patchGithubSettings,
+  patchScheduleSettings,
 } from '../shared/storage'
-import type { FontSettings, GithubSettings, Settings } from '../shared/types'
+import type {
+  FontSettings,
+  GithubSettings,
+  ScheduleSettings,
+  Settings,
+} from '../shared/types'
 import { LicencesPanel } from './LicencesPanel'
 import { PANELS } from './panels'
 
@@ -34,6 +40,13 @@ export function App() {
 
   // Not a feature, so it is kept out of PANELS and off the feature menu.
   const showingLicences = activeId === LICENCES_ID
+  const patchSchedule = (patch: Partial<ScheduleSettings>) => {
+    setSettings((prev) =>
+      prev ? { ...prev, schedule: { ...prev.schedule, ...patch } } : prev,
+    )
+    void patchScheduleSettings(patch)
+  }
+
   const active = PANELS.find((panel) => panel.id === activeId) ?? PANELS[0]
 
   return (
@@ -92,6 +105,7 @@ export function App() {
               settings={settings}
               patchFont={patchFont}
             patchGithub={patchGithub}
+            patchSchedule={patchSchedule}
           />
         )}
       </main>

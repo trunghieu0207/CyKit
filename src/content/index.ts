@@ -3,6 +3,7 @@ import type { Settings } from '../shared/types'
 import { applyFont } from './features/font'
 import { applyFontMetrics } from './features/font-metrics'
 import { applyGithubCopy } from './features/github-copy'
+import { applySchedule } from './features/schedule'
 
 /**
  * Every feature gets an `apply(settings)` that must be idempotent — it is
@@ -14,6 +15,7 @@ const FEATURES: readonly ((settings: Settings) => void)[] = [
   applyFont,
   applyFontMetrics,
   applyGithubCopy,
+  applySchedule,
 ]
 
 function applyAll(settings: Settings): void {

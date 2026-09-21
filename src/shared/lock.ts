@@ -225,8 +225,8 @@ export function baseBranchFrom(doc: Document): string | null {
  * visible rather than silently doing nothing.
  *
  * A pattern with a slash is matched as `owner/repo`; without one it matches
- * the repository name under any owner, so `garoon` covers both
- * `acme/app` and `acme-private/app`.
+ * the repository name under any owner, so `app` covers both `acme/app` and
+ * `acme-private/app`.
  */
 export function matchesRepo(owner: string, repo: string, patterns: string): boolean {
   const wanted = patterns

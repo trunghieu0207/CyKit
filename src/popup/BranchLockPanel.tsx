@@ -124,15 +124,15 @@ export function BranchLockPanel({ settings, patchBranchLock }: PanelProps) {
           <span>Repositories</span>
           <input
             type="text"
-            placeholder="my-repo"
+            placeholder="my-repo, owner/other-repo"
             value={lock.repos}
             onChange={(e) => patchBranchLock({ repos: e.target.value })}
           />
         </label>
         <p className="hint">
-          Comma-separated. <code>garoon</code> matches that name under any
-          owner; <code>owner/garoon</code> is exact. Leave empty to warn on
-          every repository.
+          Comma-separated. A bare name matches under any owner;
+          <code>owner/name</code> is exact. Leave empty to warn on every
+          repository.
         </p>
 
         <label className="field">

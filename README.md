@@ -371,6 +371,10 @@ Details:
   a bolt-on next to "This branch has not been deployed"; this reads as another
   row of the same list. Locked keeps a red border and title, since that one
   should catch an eye already travelling towards the merge button.
+- The type sizes were **measured off a screenshot** rather than guessed: the
+  glyph band of GitHub's own row title came out at 15px against 13px for ours,
+  which put GitHub at 16px where we had 14px. Re-rendered side by side, both
+  now measure the same band.
 - **The event's own times are authoritative**, and they are resolved to an
   absolute instant before anything else looks at them. When `dateTime` carries
   a UTC offset it names an instant outright — `19:00+09:00` and `17:00+07:00`

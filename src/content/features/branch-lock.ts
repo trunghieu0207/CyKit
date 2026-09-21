@@ -145,19 +145,20 @@ function ensureStyle(): void {
 }
 
 #${ROOT_ID} .cykit-bl-text{flex:1;min-width:0}
+/* 16px, measured against GitHub's own rows: at 14px the title sat visibly
+   smaller than "This branch has not been deployed" beside it. */
 #${ROOT_ID} .cykit-bl-head{
   display:block;
-  font-size:14px;
+  font-size:16px;
   font-weight:600;
-  line-height:20px;
+  line-height:24px;
 }
 #${ROOT_ID}[data-tone="locked"] .cykit-bl-head{color:var(--fgColor-danger, #cf222e)}
 #${ROOT_ID} .cykit-bl-sub{
   display:block;
-  margin-top:1px;
   color:var(--fgColor-muted, #59636e);
-  font-size:13px;
-  line-height:18px;
+  font-size:14px;
+  line-height:20px;
 }`
   ;(document.head ?? document.documentElement).appendChild(style)
 }

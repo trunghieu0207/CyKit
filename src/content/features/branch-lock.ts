@@ -170,12 +170,20 @@ async function load(origin: string, organizationId: string, days: number) {
   return inFlight
 }
 
+/**
+ * Shown in the reader's own zone, with the zone named.
+ *
+ * The titles are written in JST and the team reading them is not in Japan, so
+ * an unlabelled "12:00" would be read as the Japanese time it is not. Naming
+ * the zone makes the conversion visible instead of silent.
+ */
 function when(d: Date): string {
   return d.toLocaleString(undefined, {
     month: 'short',
     day: 'numeric',
     hour: '2-digit',
     minute: '2-digit',
+    timeZoneName: 'short',
   })
 }
 

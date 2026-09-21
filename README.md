@@ -364,6 +364,18 @@ Details:
   `.base-ref` remains as a fallback for older GitHub Enterprise.
 - The banner is placed in `[data-testid="mergebox-partial"]`, with a chain of
   fallbacks ending at `main`: appearing somewhere worse beats not appearing.
+- **The window lives in the title, not in the event.** On this calendar the
+  event itself is an all-day marker; the hours that matter are written in the
+  subject, in JST. `parseLockTitleWindow` reads them and converts, so a reader
+  in Vietnam sees 17:00 for a window that opens at 19:00 JST. The banner names
+  the zone it is showing, because an unlabelled time would be read as the
+  Japanese one it is not.
+- **Titles carry no year.** It is taken from the event's own start, which sits
+  within days of the window, and the neighbouring years are tried so that a
+  window spanning New Year (`Dec/30 → Jan/02`) lands in the right years instead
+  of ending three hundred days before it starts.
+- When a title has no range at all, the event's own times are used instead —
+  a window written unusually is still honoured rather than dropped.
 - `src/shared/lock.ts` parses the titles. The 🔒 is **not** required — a window
   typed without it would otherwise be missed silently, and for a safety feature
   a false positive on a branch nobody targets is much cheaper than a miss.

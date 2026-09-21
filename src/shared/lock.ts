@@ -1,4 +1,3 @@
-import { statusOf } from './garoon'
 import type { ScheduleEvent } from './garoon'
 
 /**
@@ -15,6 +14,89 @@ import type { ScheduleEvent } from './garoon'
 export interface LockWindow {
   branch: string
   event: ScheduleEvent
+  /** When the branch actually closes — from the title, not the event. */
+  start: Date
+  /** When it reopens; null when the title gives no end. */
+  end: Date | null
+  /** True when the window came from the title rather than the event times. */
+  fromTitle: boolean
+}
+
+/**
+ * Minutes east of UTC for the labels these titles carry. The team writes JST,
+ * and that is the default when no label is present — guessing the reader's own
+ * zone would silently shift every window by the difference.
+ */
+const ZONES: Record<string, number> = { jst: 540, kst: 540, ict: 420, utc: 0, gmt: 0 }
+const DEFAULT_ZONE = ZONES.jst!
+
+const MONTHS = [
+  'jan', 'feb', 'mar', 'apr', 'may', 'jun',
+  'jul', 'aug', 'sep', 'oct', 'nov', 'dec',
+]
+
+/**
+ * `Sep/24 19:00 - Sep/28 12:00`, with the end's month and day optional when the
+ * window closes the same day. Several dash characters are accepted because
+ * these titles are typed by hand.
+ */
+const RANGE =
+  /([A-Za-z]{3,9})\/(\d{1,2})\s+(\d{1,2}):(\d{2})\s*[-–—~]+\s*(?:([A-Za-z]{3,9})\/(\d{1,2})\s+)?(\d{1,2}):(\d{2})/
+
+function monthIndex(name: string): number {
+  return MONTHS.indexOf(name.slice(0, 3).toLowerCase())
+}
+
+function atZone(year: number, month: number, day: number, h: number, m: number, zone: number): Date {
+  // The title states a wall-clock time in its own zone, so build the instant
+  // from UTC and subtract the offset rather than going through local time.
+  return new Date(Date.UTC(year, month, day, h, m) - zone * 60_000)
+}
+
+function zoneOf(subject: string): number {
+  const label = /\(([A-Za-z]{3,4})\)/.exec(subject)?.[1]?.toLowerCase()
+  return label === undefined ? DEFAULT_ZONE : (ZONES[label] ?? DEFAULT_ZONE)
+}
+
+/**
+ * Reads the window out of a title such as
+ * `🔒 [main] Sep/24 19:00 - Sep/28 12:00 (JST)`.
+ *
+ * The title carries no year, so it is taken from `anchor` — the event's own
+ * start, which sits within days of the window it describes. The neighbouring
+ * years are tried too and the closest match wins, which is what makes a window
+ * spanning New Year (`Dec/30 → Jan/02`) land in the right years instead of
+ * ending three hundred days before it starts.
+ */
+export function parseLockTitleWindow(
+  subject: string,
+  anchor: Date,
+): { start: Date; end: Date | null } | null {
+  const m = RANGE.exec(subject)
+  if (!m) return null
+
+  const startMonth = monthIndex(m[1]!)
+  const endMonth = m[5] ? monthIndex(m[5]) : startMonth
+  if (startMonth < 0 || endMonth < 0) return null
+
+  const startDay = Number(m[2])
+  const endDay = m[6] ? Number(m[6]) : startDay
+  const zone = zoneOf(subject)
+
+  let best: { start: Date; end: Date } | null = null
+  for (const year of [anchor.getFullYear() - 1, anchor.getFullYear(), anchor.getFullYear() + 1]) {
+    const start = atZone(year, startMonth, startDay, Number(m[3]), Number(m[4]), zone)
+    let end = atZone(year, endMonth, endDay, Number(m[7]), Number(m[8]), zone)
+    // A window that appears to end before it starts has crossed New Year.
+    if (end < start) end = atZone(year + 1, endMonth, endDay, Number(m[7]), Number(m[8]), zone)
+    if (
+      !best ||
+      Math.abs(start.getTime() - anchor.getTime()) < Math.abs(best.start.getTime() - anchor.getTime())
+    ) {
+      best = { start, end }
+    }
+  }
+  return best
 }
 
 export interface LockState {
@@ -40,12 +122,25 @@ export function parseLockBranch(subject: string): string | null {
   return m ? m[1]!.toLowerCase() : null
 }
 
-/** Every event whose title names a branch, paired with that branch. */
+/**
+ * Every event whose title names a branch, with the window it describes.
+ *
+ * The title wins over the event's own times, because on this calendar the
+ * event is a marker and the real window is written in the subject. When a
+ * title carries no range the event times are used instead, so a window created
+ * without the usual wording is still honoured rather than dropped.
+ */
 export function lockWindows(events: readonly ScheduleEvent[]): LockWindow[] {
   const out: LockWindow[] = []
   for (const event of events) {
     const branch = parseLockBranch(event.subject)
-    if (branch) out.push({ branch, event })
+    if (!branch) continue
+    const titled = parseLockTitleWindow(event.subject, event.start)
+    out.push(
+      titled
+        ? { branch, event, start: titled.start, end: titled.end, fromTitle: true }
+        : { branch, event, start: event.start, end: event.end, fromTitle: false },
+    )
   }
   return out
 }
@@ -64,14 +159,13 @@ export function lockStateFor(
   const wanted = branch.toLowerCase()
   const windows = lockWindows(events)
     .filter((w) => w.branch === wanted)
-    .sort((a, b) => a.event.start.getTime() - b.event.start.getTime())
+    .sort((a, b) => a.start.getTime() - b.start.getTime())
 
-  const open = windows.find((w) => statusOf(w.event, now) === 'now')
-  if (open) {
-    return { branch: wanted, locked: true, until: open.event.end, next: null }
-  }
+  // Half-open, as everywhere else: a window ending at 12:00 is over at 12:00.
+  const open = windows.find((w) => w.start <= now && (w.end === null || w.end > now))
+  if (open) return { branch: wanted, locked: true, until: open.end, next: null }
 
-  const upcoming = windows.find((w) => statusOf(w.event, now) === 'future')
+  const upcoming = windows.find((w) => w.start > now)
   return { branch: wanted, locked: false, until: null, next: upcoming ?? null }
 }
 

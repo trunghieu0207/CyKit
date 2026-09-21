@@ -2,11 +2,13 @@ import type { ComponentType } from 'react'
 import type {
   FontSettings,
   GithubSettings,
+  BranchLockSettings,
   ScheduleSettings,
   Settings,
 } from '../shared/types'
 import { FontPanel } from './FontPanel'
 import { GithubPanel } from './GithubPanel'
+import { BranchLockPanel } from './BranchLockPanel'
 import { SchedulePanel } from './SchedulePanel'
 
 export interface PanelProps {
@@ -14,6 +16,7 @@ export interface PanelProps {
   patchFont: (patch: Partial<FontSettings>) => void
   patchGithub: (patch: Partial<GithubSettings>) => void
   patchSchedule: (patch: Partial<ScheduleSettings>) => void
+  patchBranchLock: (patch: Partial<BranchLockSettings>) => void
 }
 
 export interface PanelEntry {
@@ -54,5 +57,13 @@ export const PANELS: readonly PanelEntry[] = [
     glyph: '17',
     isOn: (s) => s.schedule.enabled,
     Component: SchedulePanel,
+  },
+  {
+    id: 'branch-lock',
+    label: 'Branch locks',
+    hint: 'Warn before merging',
+    glyph: '\u{1F512}',
+    isOn: (s) => s.branchLock.enabled,
+    Component: BranchLockPanel,
   },
 ]

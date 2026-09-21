@@ -560,3 +560,75 @@ select {
   font-size: 11px;
   font-weight: 600;
 }
+
+/* --- branch lock panel --- */
+
+.btn {
+  flex: none;
+  padding: 5px 12px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--bg);
+  color: var(--text);
+  font: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.btn:hover:not(:disabled) {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.btn:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.ok-pill {
+  flex: none;
+  padding: 2px 9px;
+  border-radius: 999px;
+  background: #e6f4ec;
+  color: #1a7f37;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.field {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  font-weight: 500;
+}
+
+.field > span {
+  flex: none;
+  width: 110px;
+}
+
+.field input {
+  flex: 1;
+  min-width: 0;
+  padding: 5px 8px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--bg);
+  color: inherit;
+  font: inherit;
+  font-size: 12px;
+}
+
+.field input:focus {
+  outline: 2px solid var(--accent);
+  outline-offset: -1px;
+}
+
+.hint.ok {
+  color: #1a7f37;
+}
+
+.hint.bad {
+  color: #b3261e;
+}

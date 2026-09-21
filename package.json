@@ -6,9 +6,10 @@
   "type": "module",
   "packageManager": "pnpm@10.29.3",
   "scripts": {
-    "build": "pnpm typecheck && pnpm build:pages && pnpm build:content",
+    "build": "pnpm typecheck && pnpm build:pages && pnpm build:content && pnpm build:background",
     "build:pages": "vite build",
     "build:content": "vite build --config vite.config.content.ts",
+    "build:background": "vite build --config vite.config.background.ts",
     "package": "pnpm build && node scripts/package.mjs",
     "bump": "node scripts/bump.mjs",
     "watch": "concurrently -n pages,content -c cyan,magenta \"vite build --watch\" \"vite build --config vite.config.content.ts --watch\"",

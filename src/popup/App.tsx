@@ -5,8 +5,10 @@ import {
   patchFontSettings,
   patchGithubSettings,
   patchScheduleSettings,
+  patchBranchLockSettings,
 } from '../shared/storage'
 import type {
+  BranchLockSettings,
   FontSettings,
   GithubSettings,
   ScheduleSettings,
@@ -45,6 +47,13 @@ export function App() {
       prev ? { ...prev, schedule: { ...prev.schedule, ...patch } } : prev,
     )
     void patchScheduleSettings(patch)
+  }
+
+  const patchBranchLock = (patch: Partial<BranchLockSettings>) => {
+    setSettings((prev) =>
+      prev ? { ...prev, branchLock: { ...prev.branchLock, ...patch } } : prev,
+    )
+    void patchBranchLockSettings(patch)
   }
 
   const active = PANELS.find((panel) => panel.id === activeId) ?? PANELS[0]
@@ -106,6 +115,7 @@ export function App() {
               patchFont={patchFont}
             patchGithub={patchGithub}
             patchSchedule={patchSchedule}
+            patchBranchLock={patchBranchLock}
           />
         )}
       </main>

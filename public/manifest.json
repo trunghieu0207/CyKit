@@ -50,5 +50,16 @@
         "https://*.cybozu-dev.com/*"
       ]
     }
-  ]
+  ],
+  "optional_host_permissions": [
+    "https://*.cybozu.com/*",
+    "https://*.kintone.com/*",
+    "https://*.cybozu.cn/*",
+    "https://*.kintone.cn/*",
+    "https://*.cybozu-dev.com/*"
+  ],
+  "background": {
+    "service_worker": "background.js",
+    "type": "module"
+  }
 }

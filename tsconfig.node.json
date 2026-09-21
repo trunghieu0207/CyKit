@@ -14,5 +14,5 @@
     "skipLibCheck": true,
     "noEmit": true
   },
-  "include": ["vite.config.ts", "vite.config.content.ts"]
+  "include": ["vite.config.ts", "vite.config.content.ts", "vite.config.background.ts"]
 }

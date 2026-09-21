@@ -71,8 +71,23 @@ export interface ScheduleSettings {
   collapsed: boolean
 }
 
+/**
+ * Branch-lock windows published on a Garoon group calendar, surfaced on GitHub
+ * pull requests so nobody merges into a closed branch.
+ */
+export interface BranchLockSettings {
+  enabled: boolean
+  /** e.g. https://example.cybozu.com — captured when you visit a Cybozu page. */
+  origin: string
+  /** Garoon organization id whose calendar carries the windows. */
+  organizationId: string
+  /** How far ahead to look, in days. */
+  days: number
+}
+
 export interface Settings {
   font: FontSettings
   github: GithubSettings
   schedule: ScheduleSettings
+  branchLock: BranchLockSettings
 }

@@ -1,6 +1,6 @@
 # Privacy Policy — CyKit Extension
 
-_Last updated: 2026-09-21_
+_Last updated: 2026-09-22_
 
 **CyKit does not collect, transmit, or sell any data.** It has no analytics, no
 telemetry, no accounts, and no server of its own.
@@ -38,10 +38,24 @@ memory for five minutes to avoid re-requesting; they are never written to
 storage and never leave your browser. The feature only reads — it cannot
 create, change or delete anything in Garoon.
 
+**Branch locks feature.** Also **off by default**, and additionally gated on a
+permission you grant by hand.
+
+When enabled, it reads branch-lock windows from one Garoon group calendar you
+nominate, so a pull request can warn you before you merge into a closed branch.
+Because a GitHub page cannot call Garoon itself, the request is made by the
+extension's own background worker — which is why it needs host access to your
+Cybozu address, requested from the popup rather than at install time. You can
+withdraw it at any time from `chrome://extensions`.
+
+It reads only that calendar, only to display the result on the page, and sends
+nothing to anywhere else. It cannot create, change or delete anything.
+
 ## What is stored
 
-Your feature settings — chosen font, size, weight, and which products each
-feature applies to — are stored with `chrome.storage.sync`. That is Chrome's
+Your feature settings — chosen font, size, weight, which products each feature
+applies to, and for the branch-lock feature your Garoon address and the group
+id you nominated — are stored with `chrome.storage.sync`. That is Chrome's
 own settings storage. If you have Chrome Sync enabled, Chrome synchronises it
 through your Google Account so your settings follow you between devices; this
 is done by Chrome, not by CyKit, and the authors never receive it. No page
@@ -68,6 +82,7 @@ third party involved.
 | `storage` | Save your feature settings |
 | Host access to the Cybozu domains | Apply the font changes to those pages, and — if you enable Schedule — read your own Garoon schedule from that same host |
 | Host access to `github.com` | Add the Copy button to pull request and issue pages |
+| Optional host access to your Cybozu address | Granted by you, only for the branch-lock feature, so the extension can read that one group calendar while you are on GitHub |
 
 ## Third-party content
 

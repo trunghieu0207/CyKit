@@ -25,6 +25,14 @@ export const DEFAULT_SETTINGS: Settings = {
     days: 3,
     collapsed: false,
   },
+  branchLock: {
+    // Also opt-in, and additionally gated on a host permission the user grants
+    // by hand.
+    enabled: false,
+    origin: '',
+    organizationId: '',
+    days: 14,
+  },
 }
 
 /** Shallow-merges stored values over defaults, one level per feature. */
@@ -40,6 +48,7 @@ function withDefaults(stored: unknown): Settings {
     },
     github: { ...DEFAULT_SETTINGS.github, ...raw.github },
     schedule: { ...DEFAULT_SETTINGS.schedule, ...raw.schedule },
+    branchLock: { ...DEFAULT_SETTINGS.branchLock, ...raw.branchLock },
   }
 }
 
@@ -71,6 +80,15 @@ export async function patchScheduleSettings(
 ): Promise<Settings> {
   const current = await getSettings()
   const next: Settings = { ...current, schedule: { ...current.schedule, ...patch } }
+  await chrome.storage.sync.set({ [KEY]: next })
+  return next
+}
+
+export async function patchBranchLockSettings(
+  patch: Partial<Settings['branchLock']>,
+): Promise<Settings> {
+  const current = await getSettings()
+  const next: Settings = { ...current, branchLock: { ...current.branchLock, ...patch } }
   await chrome.storage.sync.set({ [KEY]: next })
   return next
 }

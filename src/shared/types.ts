@@ -81,6 +81,12 @@ export interface BranchLockSettings {
    * every repository.
    */
   repos: string
+  /**
+   * Which target branches are worth reporting on, comma-separated. A pull
+   * request into anything else gets no banner at all. Empty means every
+   * branch.
+   */
+  branches: string
 }
 
 export interface Settings {

@@ -239,3 +239,25 @@ export function matchesRepo(owner: string, repo: string, patterns: string): bool
   const name = repo.toLowerCase()
   return wanted.some((p) => (p.includes('/') ? p === full : p === name))
 }
+
+/**
+ * Whether this target branch is one the windows ever describe.
+ *
+ * A pull request into a feature branch is never blocked by a release lock, so
+ * a row telling its author the branch is open would be noise — and noise is
+ * how a warning earns the right to be ignored.
+ *
+ * Deliberately a setting rather than derived from the calendar. Reading the
+ * branches out of the fetched windows would look self-configuring, but it
+ * fails exactly when it matters: with no lock scheduled in the window the
+ * calendar mentions no branches at all, and "main is open" — the most useful
+ * thing the feature ever says — would vanish.
+ */
+export function matchesBranch(branch: string, patterns: string): boolean {
+  const wanted = patterns
+    .split(',')
+    .map((p) => p.trim().toLowerCase())
+    .filter(Boolean)
+  if (wanted.length === 0) return true
+  return wanted.includes(branch.toLowerCase())
+}

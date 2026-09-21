@@ -308,6 +308,14 @@ Details:
   install stays visible rather than silently doing nothing. On a repository
   outside the list nothing is rendered at all, since the feature is making no
   claim there.
+- **And to the branches the windows are published for**, defaulting to
+  `main, beta`. A merge into a feature branch is never blocked by a release
+  lock, so a row telling its author the branch is open is noise — and noise is
+  how a warning earns the right to be ignored. Deliberately a setting rather
+  than derived from the fetched windows: reading the branch names out of the
+  calendar would look self-configuring but fails exactly when it matters, since
+  with no lock scheduled the calendar names no branches and "main is open" —
+  the most useful thing the feature ever says — would vanish.
 - The banner is placed in `[data-testid="mergebox-partial"]`, with a chain of
   fallbacks ending at `main`: appearing somewhere worse beats not appearing.
 - **It is shaped like the status rows GitHub already stacks there** — white

@@ -26,6 +26,9 @@ export const DEFAULT_SETTINGS: Settings = {
     organizationId: '',
     days: 14,
     repos: '',
+    // The branches these windows are published for; anything else is never
+    // blocked by a release lock.
+    branches: 'main, beta',
   },
 }
 

@@ -135,6 +135,20 @@ export function BranchLockPanel({ settings, patchBranchLock }: PanelProps) {
           every repository.
         </p>
 
+        <label className="field">
+          <span>Branches</span>
+          <input
+            type="text"
+            placeholder="main, beta"
+            value={lock.branches}
+            onChange={(e) => patchBranchLock({ branches: e.target.value })}
+          />
+        </label>
+        <p className="hint">
+          Only pull requests targeting these get a banner — a merge into a
+          feature branch is never blocked by a release lock.
+        </p>
+
         <div className="row">
           <button
             type="button"

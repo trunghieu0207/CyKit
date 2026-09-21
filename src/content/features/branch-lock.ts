@@ -1,7 +1,12 @@
 import type { LockRequest, LockResponse } from '../../background'
 import { formatCountdown, parseEvents } from '../../shared/garoon'
 import type { ScheduleEvent } from '../../shared/garoon'
-import { baseBranchFrom, lockStateFor, matchesRepo } from '../../shared/lock'
+import {
+  baseBranchFrom,
+  lockStateFor,
+  matchesBranch,
+  matchesRepo,
+} from '../../shared/lock'
 import { parseIssuePath } from '../../shared/github'
 import { detectProduct } from '../../shared/scope'
 import type { Settings } from '../../shared/types'
@@ -313,6 +318,12 @@ function draw(): void {
 
   const branch = baseBranchFrom(document)
   if (!branch) return
+  // Same reasoning as the repository filter: on a branch no window describes,
+  // the feature is making no claim, so saying anything would be noise.
+  if (!matchesBranch(branch, current.branches)) {
+    remove()
+    return
+  }
 
   void load(current.origin, current.organizationId, current.days).then((events) => {
     if (!settings?.enabled) {

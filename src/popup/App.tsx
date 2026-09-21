@@ -4,14 +4,12 @@ import {
   onSettingsChanged,
   patchFontSettings,
   patchGithubSettings,
-  patchScheduleSettings,
   patchBranchLockSettings,
 } from '../shared/storage'
 import type {
   BranchLockSettings,
   FontSettings,
   GithubSettings,
-  ScheduleSettings,
   Settings,
 } from '../shared/types'
 import { LicencesPanel } from './LicencesPanel'
@@ -42,13 +40,6 @@ export function App() {
 
   // Not a feature, so it is kept out of PANELS and off the feature menu.
   const showingLicences = activeId === LICENCES_ID
-  const patchSchedule = (patch: Partial<ScheduleSettings>) => {
-    setSettings((prev) =>
-      prev ? { ...prev, schedule: { ...prev.schedule, ...patch } } : prev,
-    )
-    void patchScheduleSettings(patch)
-  }
-
   const patchBranchLock = (patch: Partial<BranchLockSettings>) => {
     setSettings((prev) =>
       prev ? { ...prev, branchLock: { ...prev.branchLock, ...patch } } : prev,
@@ -114,7 +105,6 @@ export function App() {
               settings={settings}
               patchFont={patchFont}
             patchGithub={patchGithub}
-            patchSchedule={patchSchedule}
             patchBranchLock={patchBranchLock}
           />
         )}

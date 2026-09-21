@@ -6,13 +6,10 @@ kintone, Garoon, and the cybozu.com portal.
 **Feature 1 — Font.** Replaces kintone's default font across the whole UI with a
 bundled, more readable webfont, and scales text size and weight.
 
-**Feature 2 — Schedule.** Shows your Garoon calendar on kintone pages. Opt-in;
-it is the only feature that contacts a server.
-
-**Feature 3 — Branch locks.** Warns on a pull request when the branch it targets
+**Feature 2 — Branch locks.** Warns on a pull request when the branch it targets
 is closed for merging, reading the windows from a Garoon group calendar.
 
-**Feature 4 — GitHub.** Adds a Copy button to pull request and issue pages that
+**Feature 3 — GitHub.** Adds a Copy button to pull request and issue pages that
 puts the title, the canonical link, or both on the clipboard.
 
 ## Setup
@@ -271,65 +268,6 @@ what keeps the font override from following the content script onto GitHub.
 `web_accessible_resources` for the fonts is deliberately *not* opened to
 github.com.
 
-## The Schedule feature
-
-`src/content/features/schedule.ts` puts a floating card on `/k/` pages showing
-the signed-in user's Garoon diary.
-
-**It answers a question rather than listing rows.** A real Garoon day is mostly
-attendance markers — `[Make Up]`, `[Rest all day]`, `[Late]`, `[Go out]` — which
-are all-day entries for the whole team. Counting them gave "9 today" when only
-three were meetings, and what you actually want at a glance was buried in the
-middle. So the card leads with a headline (what is running, or what is next and
-in how long), counts meetings rather than entries, dims what has finished, and
-rolls the all-day markers into one expandable line.
-
-Times update on a 30-second tick; the same timer refetches once the five-minute
-cache expires. Rows link to the event in Garoon.
-
-**Why this needs no new permission.** kintone and Garoon are served from the
-same host, so `GET /g/api/v1/schedule/events` from a content script on a `/k/`
-page is same-origin: the session cookie rides along, and `host_permissions`
-never enters into it. Moving this to the popup would change that — the popup is
-an extension page, the call becomes cross-origin, and the added permission
-would disable the extension for every existing user until they accepted it.
-
-Details that matter:
-
-- **Session auth, reads only.** Garoon's docs require an `X-Requested-With`
-  header for session-authenticated calls, and a CSRF token *for writes*. This
-  never writes, so no token is needed and none is obtained — which also avoids
-  reaching into the page's JS context from an isolated world.
-- **`target` is omitted deliberately.** The API then defaults to the user
-  running the request, which is exactly "my schedule" and avoids having to
-  discover a user id.
-- **Off by default.** It is the only feature that talks to a server, so an
-  update does not quietly switch it on.
-- **Failure is silent.** Signed out, Garoon not enabled on the host, network
-  down — each returns no card rather than a broken one. Nothing is allowed to
-  throw into someone's kintone page.
-- **The card is `position: fixed` and anchors to nothing.** Injecting into
-  kintone's own markup would mean matching its class names, which move between
-  versions.
-- **Top frame only.** The content script runs with `all_frames: true` because
-  the font features need it, but kintone's portal embeds portlets in iframes —
-  and a fixed-position card inside an iframe anchors to *that* iframe's
-  viewport, so the portal drew one card per frame. Guarded with
-  `window.self === window.top`; comparing the references is safe cross-origin
-  even though reading through them is not.
-- Responses are held in memory for five minutes and never written to storage.
-- **Event links are constructed, not returned.** The API carries no URL for an
-  event, so rows point at Garoon's long-standing
-  `/g/schedule/view.csp?event=<id>`.
-- **`[start, end)` is half-open.** A meeting ending at 14:00 is over at 14:00 —
-  otherwise the headline keeps advertising a meeting that just finished while
-  the next one is the thing you need.
-
-`src/shared/garoon.ts` holds the parts worth testing on their own: RFC 3339
-with the local offset, day windows, defensive parsing (an event with no usable
-start is dropped, unknown fields ignored), and bucketing into days — including
-the midnight boundary, where 23:59 and 00:01 must land on different days.
-
 ## The branch-lock feature
 
 Garoon carries windows like `🔒 [main] Sep/24 19:00 - Sep/28 12:00 (JST)` on a
@@ -422,11 +360,10 @@ src/popup/panels.ts            sidebar menu registry — one entry per feature
 src/popup/App.tsx              popup shell: sidebar + active panel
 src/popup/FontPanel.tsx        the Font panel
 src/shared/scope.ts            kintone / Garoon / other detection from the path
-src/shared/garoon.ts           schedule API URLs + response shaping, DOM-free
+src/shared/garoon.ts           Garoon API URLs + response shaping, DOM-free
 src/shared/lock.ts             branch-lock titles, lock state, PR base branch
 src/background.ts              service worker: the one cross-origin fetch
 src/content/features/branch-lock.ts   merge warning on pull requests
-src/content/features/schedule.ts      Garoon schedule card on kintone
 src/shared/css.ts              stylesheet generation
 src/shared/fonts.ts            font catalogue + fallback stacks
 src/shared/storage.ts          chrome.storage.sync wrapper + defaults

@@ -18,13 +18,6 @@ export const DEFAULT_SETTINGS: Settings = {
   github: {
     enabled: true,
   },
-  schedule: {
-    // Off by default. It is the one feature that talks to a server, so it is
-    // opt-in rather than something an update quietly switches on.
-    enabled: false,
-    days: 3,
-    collapsed: false,
-  },
   branchLock: {
     // Also opt-in, and additionally gated on a host permission the user grants
     // by hand.
@@ -47,7 +40,6 @@ function withDefaults(stored: unknown): Settings {
       scope: { ...DEFAULT_SETTINGS.font.scope, ...raw.font?.scope },
     },
     github: { ...DEFAULT_SETTINGS.github, ...raw.github },
-    schedule: { ...DEFAULT_SETTINGS.schedule, ...raw.schedule },
     branchLock: { ...DEFAULT_SETTINGS.branchLock, ...raw.branchLock },
   }
 }
@@ -71,15 +63,6 @@ export async function patchGithubSettings(
 ): Promise<Settings> {
   const current = await getSettings()
   const next: Settings = { ...current, github: { ...current.github, ...patch } }
-  await chrome.storage.sync.set({ [KEY]: next })
-  return next
-}
-
-export async function patchScheduleSettings(
-  patch: Partial<Settings['schedule']>,
-): Promise<Settings> {
-  const current = await getSettings()
-  const next: Settings = { ...current, schedule: { ...current.schedule, ...patch } }
   await chrome.storage.sync.set({ [KEY]: next })
   return next
 }

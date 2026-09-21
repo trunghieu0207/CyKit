@@ -3,19 +3,16 @@ import type {
   FontSettings,
   GithubSettings,
   BranchLockSettings,
-  ScheduleSettings,
   Settings,
 } from '../shared/types'
 import { FontPanel } from './FontPanel'
 import { GithubPanel } from './GithubPanel'
 import { BranchLockPanel } from './BranchLockPanel'
-import { SchedulePanel } from './SchedulePanel'
 
 export interface PanelProps {
   settings: Settings
   patchFont: (patch: Partial<FontSettings>) => void
   patchGithub: (patch: Partial<GithubSettings>) => void
-  patchSchedule: (patch: Partial<ScheduleSettings>) => void
   patchBranchLock: (patch: Partial<BranchLockSettings>) => void
 }
 
@@ -49,14 +46,6 @@ export const PANELS: readonly PanelEntry[] = [
     glyph: 'PR',
     isOn: (s) => s.github.enabled,
     Component: GithubPanel,
-  },
-  {
-    id: 'schedule',
-    label: 'Schedule',
-    hint: 'Garoon, on kintone',
-    glyph: '17',
-    isOn: (s) => s.schedule.enabled,
-    Component: SchedulePanel,
   },
   {
     id: 'branch-lock',

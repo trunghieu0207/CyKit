@@ -65,13 +65,12 @@ READABLE TEXT ON KINTONE AND GAROON
   changes.
 • Choose per product whether it applies: kintone, Garoon, or neither.
 
-YOUR GAROON SCHEDULE, ON KINTONE (OPT-IN)
+BRANCH LOCK WARNINGS ON GITHUB (OPT-IN)
 
-• A small card on kintone pages listing what is on your Garoon calendar, so
-  checking your next meeting does not mean switching tabs.
-• Reads your own schedule over the session you are already signed in with.
-  kintone and Garoon share a host, so no extra permission is needed and no
-  password is ever stored.
+• Teams that close main or beta for a release publish the window on a Garoon
+  group calendar. This puts it on the pull request, right above the merge
+  button, so nobody merges into a branch that is shut.
+• Reads one group calendar you nominate, over a permission you grant by hand.
 • Read-only, and switched off until you turn it on.
 
 ONE-CLICK COPY ON GITHUB
@@ -128,7 +127,7 @@ These values never leave the browser. No page content, browsing history or perso
 
 github.com is needed for the Copy button on pull request and issue pages. When the user clicks it, the extension reads the page title and builds the canonical URL, then writes both to the clipboard. It reads nothing else and runs on no other part of GitHub.
 
-The optional Schedule feature issues one request, and only when the user switches it on: GET /g/api/v1/schedule/events against the same Cybozu host the page is served from, authenticated by the session cookie the browser already holds. It reads the user's own events, renders them on the page, and sends nothing to any other destination. There is no server belonging to this extension.
+The optional branch-lock feature issues one request, and only when the user switches it on and grants access by hand: GET /g/api/v1/schedule/events against the Garoon address they nominated, reading the one group calendar they nominated, authenticated by the session cookie the browser already holds. It renders the result on the pull request and sends nothing to any other destination. There is no server belonging to this extension.
 ```
 
 ### Remote code
@@ -138,7 +137,7 @@ Select **No, I am not using remote code**, then paste:
 ```
 All JavaScript and CSS ships inside the package. The nine bundled webfonts are also in the package and are loaded from chrome-extension:// URLs, so nothing is fetched from Google Fonts or any other host while the user browses.
 
-None. All code and all fonts are bundled in the package, and the extension uses no eval, new Function, or other dynamic code execution. The optional Schedule feature reads data from the user's own Garoon over its REST API, but no code is fetched or executed from anywhere outside the package.
+None. All code and all fonts are bundled in the package, and the extension uses no eval, new Function, or other dynamic code execution. The optional branch-lock feature reads data from the user's own Garoon over its REST API, but no code is fetched or executed from anywhere outside the package.
 ```
 
 ### Data use certification

@@ -1,6 +1,6 @@
 # Privacy Policy — CyKit Extension
 
-_Last updated: 2026-09-22_
+_Last updated: 2026-09-23_
 
 **CyKit does not collect, transmit, or sell any data.** It has no analytics, no
 telemetry, no accounts, and no server of its own.
@@ -25,18 +25,6 @@ nothing leaves your browser.
 **GitHub feature.** On a pull request or issue page, reads the page title and
 URL so that it can place them on your clipboard. This happens **only when you
 click the Copy button**, and the text goes only to your clipboard.
-
-**Schedule feature.** This is the one feature that contacts a server, and it
-**starts switched off**; nothing below happens unless you turn it on.
-
-When enabled, on kintone pages it asks your own Garoon for your own upcoming
-events — `GET /g/api/v1/schedule/events` on the same host you are already
-signed in to. It uses the session cookie your browser already holds, so the
-extension never sees or stores a password, and it sends no request to anywhere
-but that Garoon. The events are rendered in a card on the page and held in
-memory for five minutes to avoid re-requesting; they are never written to
-storage and never leave your browser. The feature only reads — it cannot
-create, change or delete anything in Garoon.
 
 **Branch locks feature.** Also **off by default**, and additionally gated on a
 permission you grant by hand.
@@ -65,15 +53,15 @@ You can erase everything by removing the extension.
 
 ## Network
 
-With the Schedule feature **off**, which is how it ships, the extension makes no
-network requests at all. Fonts are bundled inside the package and loaded from
+With the branch-lock feature **off**, which is how it ships, the extension makes
+no network requests at all. Fonts are bundled inside the package and loaded from
 `chrome-extension://` URLs, so nothing is fetched from Google Fonts or any other
 host while you browse.
 
-With Schedule **on**, the only request it ever makes is to your own Garoon, on
-the same host as the kintone page you are viewing, to read your own schedule.
-There is no server belonging to this extension, no analytics endpoint, and no
-third party involved.
+With it **on**, the only request it ever makes is to the Garoon address you
+nominated, to read the one group calendar you nominated. There is no server
+belonging to this extension, no analytics endpoint, and no third party
+involved.
 
 ## Permissions
 

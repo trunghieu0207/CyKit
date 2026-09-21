@@ -123,18 +123,30 @@ export function parseLockBranch(subject: string): string | null {
 }
 
 /**
- * Every event whose title names a branch, with the window it describes.
+ * Every event whose title names a branch, with the window it closes.
  *
- * The title wins over the event's own times, because on this calendar the
- * event is a marker and the real window is written in the subject. When a
- * title carries no range the event times are used instead, so a window created
- * without the usual wording is still honoured rather than dropped.
+ * The event's own times win. They come from the API with a timezone attached
+ * and need no interpretation, whereas the title is hand-typed prose that can
+ * disagree with the event it sits on — and text that can override good data is
+ * a liability, not a safety net.
+ *
+ * The title is read only when the event cannot answer: an all-day marker, or
+ * one with no end. There the hours exist only in the subject, and reporting a
+ * lock from midnight to midnight would be wrong by hours at both ends — wrong
+ * in the unsafe direction at the close, where it would claim a branch is shut
+ * after it has reopened.
  */
 export function lockWindows(events: readonly ScheduleEvent[]): LockWindow[] {
   const out: LockWindow[] = []
   for (const event of events) {
     const branch = parseLockBranch(event.subject)
     if (!branch) continue
+
+    if (!event.isAllDay && event.end) {
+      out.push({ branch, event, start: event.start, end: event.end, fromTitle: false })
+      continue
+    }
+
     const titled = parseLockTitleWindow(event.subject, event.start)
     out.push(
       titled

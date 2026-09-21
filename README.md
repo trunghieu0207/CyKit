@@ -364,8 +364,17 @@ Details:
   `.base-ref` remains as a fallback for older GitHub Enterprise.
 - The banner is placed in `[data-testid="mergebox-partial"]`, with a chain of
   fallbacks ending at `main`: appearing somewhere worse beats not appearing.
-- **The event's own times are authoritative.** They arrive from the API with a
-  timezone attached and need no interpretation. The title repeats them as prose
+- **The event's own times are authoritative**, and they are resolved to an
+  absolute instant before anything else looks at them. When `dateTime` carries
+  a UTC offset it names an instant outright — `19:00+09:00` and `17:00+07:00`
+  are the same moment, so the reader's zone is irrelevant. When it carries no
+  offset it is a wall-clock reading in the accompanying `timeZone`, and handing
+  it to `new Date` would resolve it against the *browser's* zone instead. Those
+  agree only while the Garoon profile and the machine agree, which is precisely
+  what does not hold for a team split across Japan and Vietnam, so the named
+  zone is applied explicitly (via `Intl`, two passes, so a time near a
+  daylight-saving change lands on the right side of it). The tests assert
+  absolute UTC instants and run under two different browser timezones. The title repeats them as prose
   (`Sep/24 19:00 - Sep/28 12:00 (JST)`) and is *not* trusted over them: text
   that can override good data is a liability, not a safety net. A test pins
   this by giving an event a title that contradicts it and asserting the event

@@ -1,8 +1,8 @@
 {
   "name": "cykit",
   "private": true,
-  "version": "0.1.2",
-  "description": "Read and share work items faster: a cleaner, larger font on kintone and Garoon, plus one-click copy of GitHub PR titles and links.",
+  "version": "0.2.0",
+  "description": "Fewer trips between kintone, Garoon and GitHub: a readable font, one-click PR copy, and a warning before merging a locked branch.",
   "type": "module",
   "packageManager": "pnpm@10.29.3",
   "scripts": {

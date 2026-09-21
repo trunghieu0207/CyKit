@@ -1,0 +1,127 @@
+<!doctype html><meta charset=utf-8><title>branch lock</title>
+<style>
+ html,body{margin:0;width:1280px;height:800px;overflow:hidden}
+ body{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;
+   background:linear-gradient(160deg,#eaf3fb 0%,#dce9f6 55%,#cfe0f2 100%);
+   font:16px/1.5 -apple-system,"Segoe UI",system-ui,sans-serif;color:#1b2733}
+ h1.cap{margin:0;font-size:30px;font-weight:650;letter-spacing:-0.01em}
+ p.sub{margin:0;font-size:16px;color:#4a5b6b;max-width:840px;text-align:center}
+ .win{width:960px;border-radius:14px;background:#fff;overflow:hidden;
+   box-shadow:0 18px 44px rgba(20,50,80,.20),0 2px 6px rgba(20,50,80,.10)}
+ .bar{height:34px;background:#f0f3f6;border-bottom:1px solid #d9dee3;display:flex;align-items:center;gap:7px;padding:0 13px}
+ .dot{width:11px;height:11px;border-radius:50%}
+ .pg{padding:22px 26px 26px;font:14px/1.5 -apple-system,"Segoe UI",system-ui,sans-serif;color:#1f2328}
+ .crumb{color:#59636e;font-size:15px;margin-bottom:4px}
+ .crumb b{color:#0969da;font-weight:600}
+ .ttl{font-size:26px;font-weight:600;margin-bottom:6px}
+ .meta{color:#59636e;margin-bottom:18px}
+ .meta a{color:#0969da;font-weight:600;text-decoration:none}
+ .ghrow{display:flex;gap:16px;align-items:center;margin-bottom:8px;padding:16px;
+   border:1px solid #d1d9e0;border-radius:6px;background:#fff}
+ .ghbadge{flex:none;width:30px;height:30px;border-radius:50%;display:flex;
+   align-items:center;justify-content:center;font-size:15px;color:#fff;background:#1f883d}
+ .ghtitle{font-weight:600;font-size:16px;line-height:24px}
+ .ghsub{color:#59636e;font-size:14px;line-height:20px}
+ .mbtn{margin-top:4px;display:inline-flex;padding:7px 18px;border-radius:6px;
+   background:#1f883d;color:#fff;font-weight:600;font-size:14px}
+#cykit-branch-lock, #cykit-branch-lock *{
+  box-sizing:border-box;
+  margin:0;
+  padding:0;
+  border:0;
+  background:none;
+  box-shadow:none;
+  color:inherit;
+  font:inherit;
+  letter-spacing:normal;
+  text-align:left;
+  text-transform:none;
+  list-style:none;
+}
+
+/*
+ * Shaped after the status rows GitHub already stacks in the merge box — white
+ * ground, hairline border, and the state carried by a round icon badge rather
+ * than by flooding the row with colour. A filled panel read as a bolt-on
+ * sitting next to "This branch has not been deployed"; this reads as another
+ * row of the same list.
+ */
+#cykit-branch-lock{
+  display:flex;
+  gap:16px;
+  align-items:center;
+  margin:0 0 8px;
+  padding:16px;
+  border:1px solid var(--borderColor-default, #d1d9e0);
+  border-radius:6px;
+  background:var(--bgColor-default, #ffffff);
+  color:var(--fgColor-default, #1f2328);
+  font-family:inherit;
+  font-size:14px;
+  line-height:20px;
+}
+#cykit-branch-lock .cykit-bl-badge{
+  flex:none;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  width:30px;
+  height:30px;
+  border-radius:50%;
+  background:var(--bgColor-neutral-emphasis, #59636e);
+  color:#ffffff;
+}
+#cykit-branch-lock[data-tone="locked"] .cykit-bl-badge{
+  background:var(--bgColor-danger-emphasis, #cf222e);
+}
+#cykit-branch-lock[data-tone="soon"] .cykit-bl-badge{
+  background:var(--bgColor-attention-emphasis, #bf8700);
+}
+#cykit-branch-lock[data-tone="open"] .cykit-bl-badge{
+  background:var(--bgColor-success-emphasis, #1f883d);
+}
+#cykit-branch-lock[data-tone="unknown"] .cykit-bl-badge{
+  background:var(--bgColor-default, #fff);
+  border:1px solid var(--borderColor-default, #d1d9e0);
+  color:var(--fgColor-muted, #59636e);
+}
+
+/* Locked is the one state that should catch an eye already on its way to the
+   merge button, so it keeps a tint — everything else stays plain. */
+#cykit-branch-lock[data-tone="locked"]{
+  border-color:var(--borderColor-danger-emphasis, #cf222e);
+}
+
+#cykit-branch-lock .cykit-bl-text{flex:1;min-width:0}
+/* 16px, measured against GitHub's own rows: at 14px the title sat visibly
+   smaller than "This branch has not been deployed" beside it. */
+#cykit-branch-lock .cykit-bl-head{
+  display:block;
+  font-size:16px;
+  font-weight:600;
+  line-height:24px;
+}
+#cykit-branch-lock[data-tone="locked"] .cykit-bl-head{color:var(--fgColor-danger, #cf222e)}
+#cykit-branch-lock .cykit-bl-sub{
+  display:block;
+  color:var(--fgColor-muted, #59636e);
+  font-size:14px;
+  line-height:20px;
+}
+</style>
+<h1 class=cap>Know before you merge</h1>
+<p class=sub>Release windows live on a Garoon calendar. CyKit puts them on the pull request, right above the merge button.</p>
+<div class=win>
+  <div class=bar><span class=dot style="background:#ff5f57"></span><span class=dot style="background:#febc2e"></span><span class=dot style="background:#28c840"></span></div>
+  <div class=pg>
+    <div class=crumb><b>garoon</b> / <b>garoon</b></div>
+    <div class=ttl>PROJ-142: Fix mail body lost on reply <span style="color:#59636e;font-weight:400">#248</span></div>
+    <div class=meta>a-teammate wants to merge 3 commits into
+      <a href="#">example-org:main</a> from <a href="#">example-org:fix/mail-body</a></div>
+<div id="cykit-branch-lock" data-tone="locked"><span class="cykit-bl-badge"><svg viewBox="0 0 16 16" width="16" height="16" fill="currentColor" aria-hidden="true"><rect x="3.2" y="7.2" width="9.6" height="6.6" rx="1.4"></rect><path d="M5.4 7.2V5.2a2.6 2.6 0 0 1 5.2 0v2" fill="none" stroke="currentColor" stroke-width="1.5"></path></svg></span><span class="cykit-bl-text"><strong class="cykit-bl-head">main is locked — do not merge</strong><span class="cykit-bl-sub">Opens again Sep 28, 12:00 PM GMT+7.</span></span></div>
+    <div class=ghrow><span class=ghbadge>&#10003;</span>
+      <span><span class=ghtitle style="display:block">This branch has no conflicts with the base branch</span>
+      <span class=ghsub>Merging can be performed automatically.</span></span></div>
+    <div class=mbtn>Merge pull request</div>
+  </div>
+</div>

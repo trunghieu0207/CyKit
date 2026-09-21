@@ -81,3 +81,29 @@ export function branchesIn(events: readonly ScheduleEvent[]): string[] {
   for (const w of lockWindows(events)) seen.add(w.branch)
   return [...seen]
 }
+
+// --- reading the pull request's target branch ------------------------------
+
+/**
+ * The branch a pull request would merge into.
+ *
+ * Read from the href of the first `BranchName` link (`/owner/repo/tree/<branch>`)
+ * rather than its text. The text carries an owner prefix — `react:main` — and
+ * branch names may contain slashes, so splitting the text is ambiguous while
+ * the href is not. `.base-ref` is the pre-React markup, still on older GitHub
+ * Enterprise, and is kept as a fallback.
+ */
+export function baseBranchFrom(doc: Document): string | null {
+  const link = doc.querySelector('a[data-component="BranchName"]')
+  const href = link?.getAttribute('href') ?? ''
+  const viaHref = /\/tree\/(.+)$/.exec(href)
+  if (viaHref) return decodeURIComponent(viaHref[1]!)
+
+  const legacy = doc.querySelector('.base-ref')?.textContent?.trim()
+  if (legacy) return legacy.includes(':') ? legacy.slice(legacy.indexOf(':') + 1) : legacy
+
+  // Last resort: the link text, minus the owner prefix.
+  const text = link?.textContent?.trim()
+  if (!text) return null
+  return text.includes(':') ? text.slice(text.indexOf(':') + 1) : text
+}

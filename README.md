@@ -9,7 +9,10 @@ bundled, more readable webfont, and scales text size and weight.
 **Feature 2 — Schedule.** Shows your Garoon calendar on kintone pages. Opt-in;
 it is the only feature that contacts a server.
 
-**Feature 3 — GitHub.** Adds a Copy button to pull request and issue pages that
+**Feature 3 — Branch locks.** Warns on a pull request when the branch it targets
+is closed for merging, reading the windows from a Garoon group calendar.
+
+**Feature 4 — GitHub.** Adds a Copy button to pull request and issue pages that
 puts the title, the canonical link, or both on the clipboard.
 
 ## Setup
@@ -327,6 +330,46 @@ with the local offset, day windows, defensive parsing (an event with no usable
 start is dropped, unknown fields ignored), and bucketing into days — including
 the midnight boundary, where 23:59 and 00:01 must land on different days.
 
+## The branch-lock feature
+
+Garoon carries windows like `🔒 [main] Sep/24 19:00 - Sep/28 12:00 (JST)` on a
+group calendar, during which that branch must not be merged. Nobody on GitHub
+can see them without going to look, so `src/content/features/branch-lock.ts`
+puts the answer on the pull request, directly above the merge box.
+
+**Why this one needs a service worker and a permission.** Chrome is explicit
+that "cross-origin requests are always treated as such in content scripts, even
+if the extension has host permissions" — so unlike the kintone widget, which is
+same-origin, this cannot be done from the page. `src/background.ts` makes the
+request instead, which requires host access to the Cybozu address. That access
+is declared as `optional_host_permissions` and requested from the popup, so
+installing or updating never shows a new warning and never disables the
+extension; only someone switching this on sees a prompt.
+
+Borrowing an already-open Cybozu tab would have avoided the permission
+entirely. It was rejected: a colleague with no such tab would see no warning at
+all, which is worse than having no feature, because people come to rely on it.
+
+**Every outcome is shown, including failure.** A banner that silently fails to
+appear looks exactly like "the branch is open", and someone would merge on
+that. So `open`, `could not check`, and `not configured` each render their own
+line rather than nothing.
+
+Details:
+
+- The target branch is read from the *href* of the first
+  `a[data-component="BranchName"]` (`/owner/repo/tree/<branch>`), not its text —
+  the text carries an owner prefix (`react:main`) and branch names may contain
+  slashes, so splitting the text is ambiguous while the href is not.
+  `.base-ref` remains as a fallback for older GitHub Enterprise.
+- The banner is placed in `[data-testid="mergebox-partial"]`, with a chain of
+  fallbacks ending at `main`: appearing somewhere worse beats not appearing.
+- `src/shared/lock.ts` parses the titles. The 🔒 is **not** required — a window
+  typed without it would otherwise be missed silently, and for a safety feature
+  a false positive on a branch nobody targets is much cheaper than a miss.
+- Responses are cached for two minutes, shorter than the schedule's five: a
+  stale "open" here is the expensive kind of wrong.
+
 ## Layout
 
 ```
@@ -344,6 +387,9 @@ src/popup/App.tsx              popup shell: sidebar + active panel
 src/popup/FontPanel.tsx        the Font panel
 src/shared/scope.ts            kintone / Garoon / other detection from the path
 src/shared/garoon.ts           schedule API URLs + response shaping, DOM-free
+src/shared/lock.ts             branch-lock titles, lock state, PR base branch
+src/background.ts              service worker: the one cross-origin fetch
+src/content/features/branch-lock.ts   merge warning on pull requests
 src/content/features/schedule.ts      Garoon schedule card on kintone
 src/shared/css.ts              stylesheet generation
 src/shared/fonts.ts            font catalogue + fallback stacks

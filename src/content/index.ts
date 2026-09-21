@@ -3,6 +3,7 @@ import type { Settings } from '../shared/types'
 import { applyFont } from './features/font'
 import { applyFontMetrics } from './features/font-metrics'
 import { applyGithubCopy } from './features/github-copy'
+import { applyBranchLock } from './features/branch-lock'
 import { applySchedule } from './features/schedule'
 
 /**
@@ -16,6 +17,7 @@ const FEATURES: readonly ((settings: Settings) => void)[] = [
   applyFontMetrics,
   applyGithubCopy,
   applySchedule,
+  applyBranchLock,
 ]
 
 function applyAll(settings: Settings): void {

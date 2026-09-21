@@ -300,6 +300,14 @@ Details:
   the text carries an owner prefix (`react:main`) and branch names may contain
   slashes, so splitting the text is ambiguous while the href is not.
   `.base-ref` remains as a fallback for older GitHub Enterprise.
+- **It is scoped to the repositories the windows describe.** A lock says
+  something about one codebase, so repeating it on an unrelated pull request
+  would assert something untrue rather than merely clutter. The setting takes a
+  comma-separated list: `garoon` matches that name under any owner,
+  `owner/garoon` is exact, and empty means every repository — a half-configured
+  install stays visible rather than silently doing nothing. On a repository
+  outside the list nothing is rendered at all, since the feature is making no
+  claim there.
 - The banner is placed in `[data-testid="mergebox-partial"]`, with a chain of
   fallbacks ending at `main`: appearing somewhere worse beats not appearing.
 - **It is shaped like the status rows GitHub already stacks there** — white

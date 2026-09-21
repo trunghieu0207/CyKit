@@ -213,3 +213,29 @@ export function baseBranchFrom(doc: Document): string | null {
   if (!text) return null
   return text.includes(':') ? text.slice(text.indexOf(':') + 1) : text
 }
+
+// --- which repositories this applies to -----------------------------------
+
+/**
+ * Whether the banner belongs on this repository.
+ *
+ * A lock window says something about one codebase, so showing it on an
+ * unrelated pull request is not merely noise — it asserts something false. An
+ * empty list means every repository, which keeps a half-configured install
+ * visible rather than silently doing nothing.
+ *
+ * A pattern with a slash is matched as `owner/repo`; without one it matches
+ * the repository name under any owner, so `garoon` covers both
+ * `acme/app` and `acme-private/app`.
+ */
+export function matchesRepo(owner: string, repo: string, patterns: string): boolean {
+  const wanted = patterns
+    .split(',')
+    .map((p) => p.trim().toLowerCase().replace(/^\/+|\/+$/g, ''))
+    .filter(Boolean)
+  if (wanted.length === 0) return true
+
+  const full = `${owner.toLowerCase()}/${repo.toLowerCase()}`
+  const name = repo.toLowerCase()
+  return wanted.some((p) => (p.includes('/') ? p === full : p === name))
+}

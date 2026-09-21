@@ -25,6 +25,7 @@ export const DEFAULT_SETTINGS: Settings = {
     origin: '',
     organizationId: '',
     days: 14,
+    repos: '',
   },
 }
 

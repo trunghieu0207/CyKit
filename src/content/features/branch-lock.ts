@@ -1,7 +1,7 @@
 import type { LockRequest, LockResponse } from '../../background'
 import { formatCountdown, parseEvents } from '../../shared/garoon'
 import type { ScheduleEvent } from '../../shared/garoon'
-import { baseBranchFrom, lockStateFor } from '../../shared/lock'
+import { baseBranchFrom, lockStateFor, matchesRepo } from '../../shared/lock'
 import { parseIssuePath } from '../../shared/github'
 import { detectProduct } from '../../shared/scope'
 import type { Settings } from '../../shared/types'
@@ -296,6 +296,13 @@ function draw(): void {
   const ref = parseIssuePath(loc.pathname)
 
   if (!current?.enabled || ref?.kind !== 'pull') {
+    remove()
+    return
+  }
+  // Nothing at all on a repository the windows do not describe: a lock says
+  // something about one codebase, and repeating it elsewhere would assert
+  // something untrue rather than merely clutter.
+  if (!matchesRepo(ref.owner, ref.repo, current.repos)) {
     remove()
     return
   }

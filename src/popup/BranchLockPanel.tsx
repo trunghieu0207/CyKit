@@ -120,6 +120,21 @@ export function BranchLockPanel({ settings, patchBranchLock }: PanelProps) {
           />
         </label>
 
+        <label className="field">
+          <span>Repositories</span>
+          <input
+            type="text"
+            placeholder="my-repo"
+            value={lock.repos}
+            onChange={(e) => patchBranchLock({ repos: e.target.value })}
+          />
+        </label>
+        <p className="hint">
+          Comma-separated. <code>garoon</code> matches that name under any
+          owner; <code>owner/garoon</code> is exact. Leave empty to warn on
+          every repository.
+        </p>
+
         <div className="row">
           <button
             type="button"

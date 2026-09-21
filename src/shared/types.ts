@@ -75,6 +75,12 @@ export interface BranchLockSettings {
   organizationId: string
   /** How far ahead to look, in days. */
   days: number
+  /**
+   * Which repositories the warning belongs on, comma-separated. `garoon`
+   * matches that name under any owner; `owner/garoon` is exact. Empty means
+   * every repository.
+   */
+  repos: string
 }
 
 export interface Settings {

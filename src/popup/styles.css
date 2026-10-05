@@ -632,3 +632,44 @@ select {
 .hint.bad {
   color: #b3261e;
 }
+
+/* --- sprint readout --- */
+
+.sprint {
+  display: flex;
+  gap: 14px;
+  align-items: center;
+  padding: 11px 13px;
+  border: 1px solid var(--border);
+  border-radius: 9px;
+  background: var(--bg-sunken);
+}
+
+.sprint__no {
+  flex: none;
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+.sprint__when {
+  flex: 1;
+  min-width: 0;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+/* The closing day, marked the same way the pill on the page marks it. */
+.sprint--last {
+  border-color: #e0a32e;
+  background: #fdf6e7;
+}
+
+.sprint--last .sprint__no {
+  color: #8a5a00;
+}
+
+.sprint--bad {
+  border-color: #e3b7b4;
+  background: #fdf1f0;
+}

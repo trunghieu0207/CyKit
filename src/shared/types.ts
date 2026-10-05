@@ -89,8 +89,28 @@ export interface BranchLockSettings {
   branches: string
 }
 
+/** Which corner of the page the sprint pill sits in. */
+export type Corner = 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right'
+
+/**
+ * Shows the running sprint. Sprints are one week, Wednesday to Tuesday; the
+ * number is counted from an anchor rather than stored, so it stays right
+ * without anyone maintaining it.
+ */
+export interface SprintSettings {
+  enabled: boolean
+  /** Which products this feature acts on. */
+  scope: Scope
+  corner: Corner
+  /** The sprint that was running on `anchorStart`. */
+  anchorNumber: number
+  /** Its first day — a Wednesday — as YYYY-MM-DD. */
+  anchorStart: string
+}
+
 export interface Settings {
   font: FontSettings
   github: GithubSettings
   branchLock: BranchLockSettings
+  sprint: SprintSettings
 }

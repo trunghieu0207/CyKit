@@ -12,6 +12,10 @@ is closed for merging, reading the windows from a Garoon group calendar.
 **Feature 3 — GitHub.** Adds a Copy button to pull request and issue pages that
 puts the title, the canonical link, or both on the clipboard.
 
+**Feature 4 — Sprint.** Shows which sprint is running, in the extension's own
+panel. Turn it on to also get a small pill in a corner of kintone and Garoon.
+Sprints are one week, Wednesday to Tuesday.
+
 ## Setup
 
 ```sh
@@ -61,6 +65,47 @@ moment ago clean itself up.
 
 Because `all_frames` is on, each frame is judged by its own path. Plugin iframes
 under `/k/plugin/…` therefore stay in kintone's scope.
+
+## How the sprint feature works
+
+The sprint number is **counted, not stored**. `src/shared/sprint.ts` holds an
+anchor — sprint 439 began on Wednesday 30 September 2026 — and everything else
+is that number plus however many whole weeks have passed. Nobody has to
+maintain a list, and a machine that was asleep for a fortnight comes back
+right.
+
+Two things that look like details and are not:
+
+- **Day arithmetic goes through `Date.UTC` on local year/month/day, never a
+  subtraction of two `Date`s.** Across a daylight saving change the difference
+  between two midnights is 23 or 25 hours, which floors to the wrong day and
+  slides every later sprint by one. Neither Vietnam nor Japan observes DST, but
+  the extension does not get to assume where it is running. The suite is run
+  under `America/New_York`, `Europe/London`, `Pacific/Auckland` and
+  `America/Santiago` for that reason.
+
+- **The index uses `Math.floor`, not a truncating divide.** Dates before the
+  anchor have to count backwards, and `-1 / 7` truncates towards zero, which
+  would put the whole week before the anchor in the anchor's own sprint.
+
+The sprint runs Wednesday 00:00 to the following Wednesday 00:00 — a half-open
+week. The team describes it as ending "Tuesday afternoon", but using the end of
+Tuesday means no hours fall between one sprint and the next, so there is never
+a moment with no sprint to show.
+
+The panel's readout sits **outside** its `<fieldset disabled>`, which is the
+whole point of the split: the toggle turns off the pill on the page, not the
+answer. Someone who does not want it following them around still wants to look
+it up, so the readout and the anchor fields stay live and only the pill's own
+settings — corner and products — grey out.
+
+`src/content/features/sprint.ts` pins the pill to `document.body` and positions
+it itself, so it needs no kintone or Garoon selector at all and cannot break
+when either is redesigned. It is `pointer-events: none`, because a readout must
+never sit between the user and what it covers, and it is drawn only in the top
+frame — the Garoon portal nests iframes, and a fixed badge in each would stack
+them in one corner. A timer just after local midnight redraws it, so a page
+left open overnight rolls over on its own.
 
 ## How the font feature works
 

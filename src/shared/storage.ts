@@ -1,3 +1,4 @@
+import { DEFAULT_ANCHOR } from './sprint'
 import type { Settings } from './types'
 
 const KEY = 'settings'
@@ -30,6 +31,16 @@ export const DEFAULT_SETTINGS: Settings = {
     // blocked by a release lock.
     branches: 'main, beta',
   },
+  sprint: {
+    // Off by default. The panel answers the question without it, so drawing
+    // something over every kintone page before anyone asked would be taking a
+    // liberty for no gain.
+    enabled: false,
+    scope: { kintone: true, garoon: true, other: true },
+    corner: 'bottom-right',
+    anchorNumber: DEFAULT_ANCHOR.number,
+    anchorStart: DEFAULT_ANCHOR.start,
+  },
 }
 
 /** Shallow-merges stored values over defaults, one level per feature. */
@@ -45,6 +56,11 @@ function withDefaults(stored: unknown): Settings {
     },
     github: { ...DEFAULT_SETTINGS.github, ...raw.github },
     branchLock: { ...DEFAULT_SETTINGS.branchLock, ...raw.branchLock },
+    sprint: {
+      ...DEFAULT_SETTINGS.sprint,
+      ...raw.sprint,
+      scope: { ...DEFAULT_SETTINGS.sprint.scope, ...raw.sprint?.scope },
+    },
   }
 }
 
@@ -76,6 +92,15 @@ export async function patchBranchLockSettings(
 ): Promise<Settings> {
   const current = await getSettings()
   const next: Settings = { ...current, branchLock: { ...current.branchLock, ...patch } }
+  await chrome.storage.sync.set({ [KEY]: next })
+  return next
+}
+
+export async function patchSprintSettings(
+  patch: Partial<Settings['sprint']>,
+): Promise<Settings> {
+  const current = await getSettings()
+  const next: Settings = { ...current, sprint: { ...current.sprint, ...patch } }
   await chrome.storage.sync.set({ [KEY]: next })
   return next
 }

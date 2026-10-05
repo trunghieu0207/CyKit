@@ -4,6 +4,7 @@ import { applyFont } from './features/font'
 import { applyFontMetrics } from './features/font-metrics'
 import { applyGithubCopy } from './features/github-copy'
 import { applyBranchLock } from './features/branch-lock'
+import { applySprint } from './features/sprint'
 
 /**
  * Every feature gets an `apply(settings)` that must be idempotent — it is
@@ -16,6 +17,7 @@ const FEATURES: readonly ((settings: Settings) => void)[] = [
   applyFontMetrics,
   applyGithubCopy,
   applyBranchLock,
+  applySprint,
 ]
 
 function applyAll(settings: Settings): void {

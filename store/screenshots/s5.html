@@ -1,0 +1,96 @@
+<!doctype html><meta charset=utf-8><title>sprint</title>
+<style>
+ html,body{margin:0;width:1280px;height:800px;overflow:hidden}
+ body{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;
+   background:linear-gradient(160deg,#eaf3fb 0%,#dce9f6 55%,#cfe0f2 100%);
+   font:16px/1.5 -apple-system,"Segoe UI",system-ui,sans-serif;color:#1b2733}
+ h1.cap{margin:0;font-size:30px;font-weight:650;letter-spacing:-0.01em}
+ p.sub{margin:0;font-size:16px;color:#4a5b6b;max-width:860px;text-align:center}
+ .win{position:relative;width:980px;border-radius:14px;background:#fff;overflow:hidden;
+   box-shadow:0 18px 44px rgba(20,50,80,.20),0 2px 6px rgba(20,50,80,.10)}
+ .bar{height:34px;background:#f0f3f6;border-bottom:1px solid #d9dee3;display:flex;align-items:center;gap:7px;padding:0 13px}
+ .dot{width:11px;height:11px;border-radius:50%}
+ .kbar{height:44px;background:#3498db;display:flex;align-items:center;padding:0 16px;color:#fff;font-weight:700;font-size:15px}
+ .pg{padding:16px;background:#eef0f1;font:14px/1.6 -apple-system,"Segoe UI","Hiragino Sans",system-ui,sans-serif;color:#3a4145}
+ .card{background:#fff;border:1px solid #e3e7e8;border-radius:3px;padding:12px 15px;margin-bottom:10px}
+ .lbl{color:#7b878c;font-size:12px;font-weight:700;margin-bottom:3px}
+</style>
+<h1 class=cap>Always know which sprint you are in</h1>
+<p class=sub>One-week sprints, Wednesday to Tuesday. Set the starting point once and the number keeps itself right.</p>
+<div class=win>
+  <div class=bar><span class=dot style=background:#ff5f57></span><span class=dot style=background:#febc2e></span><span class=dot style=background:#28c840></span></div>
+  <div class=kbar>kintone</div>
+  <div class=pg>
+    <div class=card><div class=lbl>Summary</div>Cache the weekly schedule query</div>
+    <div class=card><div class=lbl>Description</div>Split from the requirement PROJ-142. The shell only uses day-content events.</div>
+    <div class=card><div class=lbl>Status</div>In progress</div>
+  </div>
+  <!--
+    The stylesheet and the pill below are produced by the content script, not
+    written by hand: both were extracted from a page where
+    src/content/features/sprint.ts had run against a frozen clock. Only the
+    positioning is overridden, to pin it inside the mock window instead of the
+    real viewport.
+  -->
+  <style>
+#cykit-sprint, #cykit-sprint *{
+  box-sizing:border-box;
+  margin:0;
+  padding:0;
+  border:0;
+  outline:0;
+  background:none;
+  box-shadow:none;
+  color:inherit;
+  font:inherit;
+  letter-spacing:normal;
+  text-align:left;
+  text-decoration:none;
+  text-transform:none;
+  text-indent:0;
+  list-style:none;
+  float:none;
+  width:auto;
+  height:auto;
+  min-width:0;
+}
+#cykit-sprint{
+  position:fixed;
+  z-index:2147482000;
+  display:block;
+  padding:7px 12px;
+  border:1px solid #d7dcdf;
+  border-radius:8px;
+  background:#ffffff;
+  box-shadow:0 2px 10px rgba(0,0,0,.12);
+  color:#3a4145;
+  font-family:system-ui,-apple-system,"Segoe UI","Hiragino Sans","Noto Sans JP",sans-serif;
+  font-size:12px;
+  line-height:1.35;
+  /* Pointer-transparent: it is a readout, and it must never sit between the
+     user and whatever it happens to cover. */
+  pointer-events:none;
+  user-select:none;
+  opacity:.94;
+}
+#cykit-sprint[data-corner="top-left"]{top:12px;left:12px}
+#cykit-sprint[data-corner="top-right"]{top:12px;right:12px}
+#cykit-sprint[data-corner="bottom-left"]{bottom:12px;left:12px}
+#cykit-sprint[data-corner="bottom-right"]{bottom:12px;right:12px}
+#cykit-sprint .cykit-sprint-no{
+  display:block;
+  font-size:13px;
+  font-weight:700;
+}
+#cykit-sprint .cykit-sprint-sub{
+  display:block;
+  margin-top:1px;
+  color:#7b878c;
+  font-size:11px;
+  white-space:nowrap;
+}
+/* The day it ends is the one worth noticing. */
+#cykit-sprint[data-last="true"]{border-color:#e0a32e}
+#cykit-sprint[data-last="true"] .cykit-sprint-no{color:#8a5a00}</style>
+  <div id="cykit-sprint" style="position:absolute;top:auto;left:auto;bottom:14px;right:14px" data-corner="bottom-right" data-last="false"><span class="cykit-sprint-no">Sprint 439</span><span class="cykit-sprint-sub">Sep 30 – Oct 6 · ends tomorrow</span></div>
+</div>

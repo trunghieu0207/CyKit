@@ -3,17 +3,20 @@ import type {
   FontSettings,
   GithubSettings,
   BranchLockSettings,
+  SprintSettings,
   Settings,
 } from '../shared/types'
 import { FontPanel } from './FontPanel'
 import { GithubPanel } from './GithubPanel'
 import { BranchLockPanel } from './BranchLockPanel'
+import { SprintPanel } from './SprintPanel'
 
 export interface PanelProps {
   settings: Settings
   patchFont: (patch: Partial<FontSettings>) => void
   patchGithub: (patch: Partial<GithubSettings>) => void
   patchBranchLock: (patch: Partial<BranchLockSettings>) => void
+  patchSprint: (patch: Partial<SprintSettings>) => void
 }
 
 export interface PanelEntry {
@@ -46,6 +49,14 @@ export const PANELS: readonly PanelEntry[] = [
     glyph: 'PR',
     isOn: (s) => s.github.enabled,
     Component: GithubPanel,
+  },
+  {
+    id: 'sprint',
+    label: 'Sprint',
+    hint: 'Show it on pages',
+    glyph: '\u2691',
+    isOn: (s) => s.sprint.enabled,
+    Component: SprintPanel,
   },
   {
     id: 'branch-lock',

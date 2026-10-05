@@ -5,11 +5,13 @@ import {
   patchFontSettings,
   patchGithubSettings,
   patchBranchLockSettings,
+  patchSprintSettings,
 } from '../shared/storage'
 import type {
   BranchLockSettings,
   FontSettings,
   GithubSettings,
+  SprintSettings,
   Settings,
 } from '../shared/types'
 import { LicencesPanel } from './LicencesPanel'
@@ -45,6 +47,11 @@ export function App() {
       prev ? { ...prev, branchLock: { ...prev.branchLock, ...patch } } : prev,
     )
     void patchBranchLockSettings(patch)
+  }
+
+  const patchSprint = (patch: Partial<SprintSettings>) => {
+    setSettings((prev) => (prev ? { ...prev, sprint: { ...prev.sprint, ...patch } } : prev))
+    void patchSprintSettings(patch)
   }
 
   const active = PANELS.find((panel) => panel.id === activeId) ?? PANELS[0]
@@ -106,6 +113,7 @@ export function App() {
               patchFont={patchFont}
             patchGithub={patchGithub}
             patchBranchLock={patchBranchLock}
+            patchSprint={patchSprint}
           />
         )}
       </main>

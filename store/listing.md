@@ -32,7 +32,7 @@ Upload these from `store/`. Sizes are the store's, not ours:
 | --- | --- | --- | --- |
 | Store icon | `store/store-icon-128.png` | 128×128 | 96×96 of artwork with 16px transparent padding, as the guidelines require. **Not** the same file as the extension's own `icons/icon-128.png`, which fills its canvas. |
 | Small promo tile | `store/promo-440x280.png` | 440×280 | Optional, but an item without one ranks lower in search. |
-| Screenshots | `01-font.png`, `04-branch-lock.png`, `03-copy-menu.png` | 1280×800 | At least one required, up to five. Lead with whichever feature you most want found. |
+| Screenshots | `01-font.png`, `04-branch-lock.png`, `05-sprint.png`, `03-copy-menu.png` | 1280×800 | At least one required, up to five. Lead with whichever feature you most want found. |
 
 All are regenerated from sources in the repo: `pnpm icons` writes the store
 icon, and the `store/screenshots/s*.html` pages render with headless Chromium
@@ -55,6 +55,14 @@ A READABLE INTERFACE ON KINTONE AND GAROON
 • Add weight for thin text, without turning already-bold headings into a smudge.
 • Icons, images and column widths are left exactly as they are. Only text changes.
 • Choose per product whether it applies: kintone, Garoon, or neither.
+
+THE SPRINT YOU ARE IN
+
+• The extension's own panel always shows the sprint number, its dates, and when it ends.
+• Want it on the page too? Turn on a small pill in the corner of kintone and Garoon. It is off until you ask for it.
+• One-week sprints running Wednesday to Tuesday. Set the anchor once and the number keeps itself right — there is no list to maintain.
+• It says “ends tomorrow” and “ends today” rather than counting days, so there is nothing to misread, and the closing day is marked.
+• It ignores the mouse and can be moved to any corner.
 
 ONE-CLICK COPY ON GITHUB
 
@@ -91,7 +99,7 @@ separate field in the **Privacy practices** tab of the item's edit page.
 ```
 CyKit has one purpose: to reduce the friction of working across the set of tools one engineering team uses side by side — kintone, Garoon and GitHub.
 
-Each feature removes one trip between them. The font feature makes the kintone and Garoon interfaces comfortable to read, so time is not lost squinting at the tools where the work is recorded. The copy button turns a GitHub pull request into the title-and-link line that gets pasted back into those same records. The branch-lock warning carries the release schedule already published on a Garoon calendar onto the GitHub pull request, where the decision to merge is actually made.
+Each feature removes one trip between them. The font feature makes the kintone and Garoon interfaces comfortable to read, so time is not lost squinting at the tools where the work is recorded. The sprint pill answers "which sprint is this" without opening the board. The copy button turns a GitHub pull request into the title-and-link line that gets pasted back into those same records. The branch-lock warning carries the release schedule already published on a Garoon calendar onto the GitHub pull request, where the decision to merge is actually made.
 
 Nothing runs outside the small, explicit list of hosts in the manifest, and each feature can be switched off independently.
 ```
@@ -99,7 +107,7 @@ Nothing runs outside the small, explicit list of hosts in the manifest, and each
 ### Permission justification — `storage`
 
 ```
-Stores the user's own settings and nothing else: the selected font, the size, minimum size and weight steps, which products each feature applies to, whether each feature is enabled, and for the branch-lock feature the Garoon address, group id, repositories and branches the user nominated.
+Stores the user's own settings and nothing else: the selected font, the size, minimum size and weight steps, which products each feature applies to, whether each feature is enabled, the sprint number and start date the user set as the counting point, and for the branch-lock feature the Garoon address, group id, repositories and branches the user nominated.
 
 These values never leave the browser. No page content, browsing history or personal data is stored.
 ```
@@ -107,11 +115,11 @@ These values never leave the browser. No page content, browsing history or perso
 ### Permission justification — host permissions
 
 ```
-*.cybozu.com, *.kintone.com, *.cybozu.cn, *.kintone.cn and *.cybozu-dev.com serve kintone and Garoon. There the extension injects one stylesheet and reads computed font sizes and weights so it can rescale them. One host serves several products, so a match pattern cannot separate them; the product is resolved from the URL path at runtime and each can be switched off.
+*.cybozu.com, *.kintone.com, *.cybozu.cn, *.kintone.cn and *.cybozu-dev.com serve kintone and Garoon. There the extension injects one stylesheet, reads computed font sizes and weights to rescale them, and may draw a small pill showing the current sprint, worked out from a date the user sets and reading nothing from the page. One host serves several products, so a match pattern cannot separate them; the product is resolved from the URL path at runtime and each can be switched off.
 
-github.com is needed for the Copy button, which reads the page title and URL on click and writes them to the clipboard, and for the branch-lock warning, which reads the pull request's target branch.
+github.com is needed for the Copy button, which reads the page title and URL on click and writes them to the clipboard, and for the branch-lock warning, which reads the target branch.
 
-The Cybozu hosts also appear under optional_host_permissions. That grant is requested at runtime from a button in the popup, only by a user enabling the branch-lock feature, and lets the background worker read one Garoon calendar they nominate — a GitHub page cannot make that request itself, as Chrome treats content-script requests as cross-origin regardless of host permissions. Nothing is written or sent elsewhere.
+The Cybozu hosts also appear under optional_host_permissions, granted at runtime from the popup only by a user enabling branch locks. It lets the background worker read one nominated Garoon calendar; a content script cannot, as Chrome treats its requests as cross-origin whatever the host permissions. Nothing is sent elsewhere.
 ```
 
 ### Remote code
@@ -148,6 +156,23 @@ They are all true: the extension collects no user data at all.
 | Privacy policy URL | `https://github.com/trunghieu0207/CyKit/blob/main/PRIVACY.md` |
 
 ---
+
+## What changed in 0.3.0
+
+- **New feature: the current sprint.** The popup always shows it; a pill in a
+  corner of kintone and Garoon is off until you turn it on, and is switchable
+  per product like the font feature.
+- **No new permissions.** It reads nothing from the page and makes no network
+  request; the number is arithmetic on an anchor date stored in settings.
+- **Branch locks: three fixes, all of which made it stay silent.** It now reads
+  a title written `🔒 main …` as well as `🔒 [main] …`; an all-day marker is
+  recognised by Garoon's real `ALL_DAY` type; and the banner announces the
+  window's own start rather than the raw event time, which on an all-day marker
+  was up to a day early.
+- **The countdown counts calendar days**, so a deadline no longer appears to
+  move during the day, and it matches how the sprint feature counts.
+- The privacy policy gained a paragraph for the sprint, and lost a stale line
+  that still described the kintone schedule widget removed before 0.2.0.
 
 ## What changed in 0.2.0
 

@@ -1,7 +1,7 @@
 {
   "name": "cykit",
   "private": true,
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Fewer trips between kintone, Garoon and GitHub: a readable font, one-click PR copy, and a warning before merging a locked branch.",
   "type": "module",
   "packageManager": "pnpm@10.29.3",

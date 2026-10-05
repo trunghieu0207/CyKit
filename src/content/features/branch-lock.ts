@@ -347,7 +347,11 @@ function draw(): void {
       return
     }
     if (state.next) {
-      const start = state.next.event.start
+      // The window's own start, not the event's. On an all-day marker the
+      // event knows only the date and `lockWindows` recovers the hour from the
+      // title; using the raw event time there announces the lock up to a day
+      // early, which is the direction that makes people stop trusting it.
+      const start = state.next.start
       paint('soon', `${branch} is open`, `Locks ${when(start)} · ${formatCountdown(now, start)}.`)
       return
     }

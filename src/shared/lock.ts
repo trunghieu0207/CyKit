@@ -3,8 +3,10 @@ import type { ScheduleEvent } from './garoon'
 /**
  * Branch-lock windows published on a Garoon group calendar, e.g.
  *
- *   🔒 [main] Sep/24 19:00 - Sep/28 12:00 (JST)
+ *   🔒 main Oct/8 0:00 - Oct/12 0:00 (JST)
  *   🔒 [beta] Oct/01 18:00 - Oct/02 09:00 (JST)
+ *
+ * Both forms appear — bare and bracketed — so both are read.
  *
  * The point of surfacing these on GitHub is to stop someone merging into a
  * branch that is closed. That makes correctness matter more than presentation:
@@ -109,16 +111,34 @@ export interface LockState {
   next: LockWindow | null
 }
 
+/** The padlock, with or without the variation selector some editors add. */
+const LOCK = '\u{1F512}\u{FE0F}?'
+
 /**
- * Reads the branch out of a title.
+ * `[main]` — the branch in brackets, which must be the first bracket so that a
+ * trailing "[JST]" or a bracketed note cannot be mistaken for one. The emoji is
+ * not required here: the brackets are explicit enough on their own, and a title
+ * typed without decoration should still be honoured.
+ */
+const BRACKETED = /^[^\[]*\[\s*([A-Za-z0-9._/-]+)\s*\]/
+
+/**
+ * `🔒 main` — the branch as a bare word, which is how the calendar is actually
+ * written. The padlock *is* required in this form; without it the first word of
+ * every entry in a shared diary would be read as a branch name.
+ */
+const BARE = new RegExp(`${LOCK}\\s*([A-Za-z0-9._/-]+)`, 'u')
+
+/**
+ * Reads the branch out of a title, in either form the team writes.
  *
- * The lock emoji is not required: it is decoration, and a title typed without
- * it should still be honoured. The bracketed branch is the part that carries
- * meaning, and it must be the first bracket so that a trailing "[JST]" or a
- * note in brackets cannot be mistaken for one.
+ * Both are accepted because getting this wrong fails silently and in the
+ * dangerous direction: an unrecognised title is not an error, it is an event
+ * that quietly is not a lock, and the branch then looks open. The brackets are
+ * tried first since they are the explicit form.
  */
 export function parseLockBranch(subject: string): string | null {
-  const m = /^[^\[]*\[\s*([A-Za-z0-9._/-]+)\s*\]/.exec(subject)
+  const m = BRACKETED.exec(subject) ?? BARE.exec(subject)
   return m ? m[1]!.toLowerCase() : null
 }
 

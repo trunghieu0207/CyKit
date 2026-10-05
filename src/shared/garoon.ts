@@ -10,6 +10,8 @@
  * never writes.
  */
 
+import { calendarDaysBetween } from './days'
+
 /** Cloud Garoon. On-premise installs put the API under a different prefix. */
 const API_PATH = '/g/api/v1/schedule/events'
 
@@ -116,8 +118,21 @@ function fromWallClock(wall: string, timeZone: string): Date | null {
   return new Date(t)
 }
 
+/** A time read from the API, and whether it named a day rather than a moment. */
+interface ReadTime {
+  at: Date
+  /** True for `{ date }`, which carries no hour at all. */
+  dateOnly: boolean
+}
+
 /**
- * Garoon returns `{ dateTime, timeZone }`.
+ * Garoon returns `{ dateTime, timeZone }` for a timed event and `{ date }` for
+ * one that occupies whole days — an all-day entry or the multi-day banner.
+ *
+ * Reading only `dateTime` was a silent hole: a banner event has no such field,
+ * so it was dropped for want of a start and the branch it locked looked open.
+ * Nothing logged it, because dropping an unparseable event is otherwise the
+ * right thing to do.
  *
  * When `dateTime` carries a UTC offset it names an instant outright, and the
  * zone beside it only says how Garoon would display it — `19:00+09:00` and
@@ -129,21 +144,34 @@ function fromWallClock(wall: string, timeZone: string): Date | null {
  * which is exactly the case that does not hold for a team working across Japan
  * and Vietnam — so the zone is applied explicitly.
  */
-function readTime(value: unknown): Date | null {
-  const box = value as { dateTime?: unknown; timeZone?: unknown } | null
+function readTime(value: unknown): ReadTime | null {
+  const box = value as { dateTime?: unknown; date?: unknown; timeZone?: unknown } | null
+  const zone = typeof box?.timeZone === 'string' && box.timeZone ? box.timeZone : null
+
+  // A bare day. `new Date('2026-10-08')` would read it as UTC midnight, which
+  // lands on the previous day for anyone west of Greenwich, so it is resolved
+  // explicitly instead.
+  if (typeof box?.date === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(box.date.trim())) {
+    const [y, mo, d] = box.date.trim().split('-').map(Number)
+    const at = zone
+      ? fromWallClock(`${box.date.trim()}T00:00`, zone)
+      : new Date(y!, mo! - 1, d!)
+    return at ? { at, dateOnly: true } : null
+  }
+
   const raw = typeof value === 'string' ? value
     : typeof box?.dateTime === 'string' ? box.dateTime
     : null
   if (!raw) return null
 
   const hasOffset = /(?:Z|[+-]\d{2}:?\d{2})$/.test(raw.trim())
-  if (!hasOffset && typeof box?.timeZone === 'string' && box.timeZone) {
-    const resolved = fromWallClock(raw, box.timeZone)
-    if (resolved) return resolved
+  if (!hasOffset && zone) {
+    const resolved = fromWallClock(raw, zone)
+    if (resolved) return { at: resolved, dateOnly: false }
   }
 
   const d = new Date(raw)
-  return Number.isNaN(d.getTime()) ? null : d
+  return Number.isNaN(d.getTime()) ? null : { at: d, dateOnly: false }
 }
 
 /**
@@ -161,29 +189,54 @@ export function parseEvents(payload: unknown): ScheduleEvent[] {
     const e = item as Record<string, unknown>
     const start = readTime(e.start)
     if (!start) continue
+    const end = readTime(e.end)
     events.push({
       id: String(e.id ?? ''),
       subject: typeof e.subject === 'string' && e.subject ? e.subject : '(no title)',
-      start,
-      end: readTime(e.end),
-      // `isAllDay` is the documented flag; "banner" is Garoon's all-day type.
-      isAllDay: e.isAllDay === true || e.eventType === 'banner',
+      start: start.at,
+      end: end?.at ?? null,
+      /*
+       * A start given as a bare day counts as all-day whatever the flags say.
+       * That is the condition the window actually depends on — it decides
+       * whether `lockWindows` trusts the event's hours or recovers them from
+       * the title — and inferring it from the data is steadier than trusting a
+       * flag whose spelling varies between Garoon versions.
+       */
+      isAllDay: start.dateOnly || e.isAllDay === true || e.eventType === 'ALL_DAY',
     })
   }
   return events.sort((a, b) => a.start.getTime() - b.start.getTime())
 }
 
 
-/** "in 12 min", "in 2h 05m", "in 3 days" — coarser the further out it is. */
+/**
+ * "in 12 min", "in 2h 05m", "tomorrow", "in 3 days" — coarser the further out.
+ *
+ * Beyond today the unit is the **calendar day**, not elapsed hours. Rounding
+ * hours made the same deadline drift during a single day: a lock 60 hours away
+ * read as "in 3 days" at nine in the morning and "in 2 days" by the evening,
+ * with nothing having changed but the clock. A calendar count holds still from
+ * midnight to midnight, and matches how the sprint feature counts, so the two
+ * never contradict each other on the same screen.
+ *
+ * Inside a day it stays on hours and minutes whatever the date says. A lock at
+ * midnight is five hours away at seven in the evening, and calling that
+ * "tomorrow" is true but useless — the whole point of the row is to say how
+ * much room is left. Hours do not drift the way rounded days did: they simply
+ * count down.
+ */
 export function formatCountdown(now: Date, target: Date): string {
   const mins = Math.round((target.getTime() - now.getTime()) / 60000)
   if (mins <= 0) return 'now'
   if (mins < 60) return `in ${mins} min`
+
   const hours = Math.floor(mins / 60)
   if (hours < 24) {
     const rest = mins % 60
     return rest === 0 ? `in ${hours}h` : `in ${hours}h ${String(rest).padStart(2, '0')}m`
   }
-  const days = Math.round(hours / 24)
-  return days === 1 ? 'tomorrow' : `in ${days} days`
+
+  // A day or more out, where the calendar is what people reason with.
+  const days = calendarDaysBetween(now, target)
+  return days <= 1 ? 'tomorrow' : `in ${days} days`
 }

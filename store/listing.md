@@ -157,7 +157,7 @@ They are all true: the extension collects no user data at all.
 
 ---
 
-## What changed in 0.3.0
+## What changed in 0.3.1
 
 - **New feature: the current sprint.** The popup now opens on an Overview
   screen that shows it, so seeing it costs nothing; a pill in a corner of

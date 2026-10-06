@@ -14,14 +14,18 @@ import type {
   SprintSettings,
   Settings,
 } from '../shared/types'
+import { DashboardPanel } from './DashboardPanel'
 import { LicencesPanel } from './LicencesPanel'
 import { PANELS } from './panels'
 
 const LICENCES_ID = 'licences'
 
+/** The landing screen. Not a feature, so it is not in PANELS. */
+const HOME_ID = 'overview'
+
 export function App() {
   const [settings, setSettings] = useState<Settings | null>(null)
-  const [activeId, setActiveId] = useState(PANELS[0]?.id ?? '')
+  const [activeId, setActiveId] = useState(HOME_ID)
 
   useEffect(() => {
     void getSettings().then(setSettings)
@@ -68,6 +72,24 @@ export function App() {
         </div>
 
         <ul className="menu">
+          <li>
+            <button
+              type="button"
+              className={`menu__item ${activeId === HOME_ID ? 'menu__item--on' : ''}`}
+              aria-current={activeId === HOME_ID}
+              onClick={() => setActiveId(HOME_ID)}
+            >
+              <span className="menu__glyph" aria-hidden="true">
+                &#9707;
+              </span>
+              <span className="menu__text">
+                Overview
+                <span className="hint">Everything at a glance</span>
+              </span>
+              {/* No status dot: there is nothing here to switch on or off. */}
+            </button>
+          </li>
+
           {PANELS.map((panel) => (
             <li key={panel.id}>
               <button
@@ -93,40 +115,20 @@ export function App() {
           ))}
         </ul>
 
-        {/*
-         * The dashboard. Every panel that defines a Summary gets a line here,
-         * so a future feature earns one by filling in that field rather than
-         * by editing this file.
-         */}
-        <div className="side__foot">
-          {settings &&
-            PANELS.map((panel) => {
-              // Bound to a capitalised local so TypeScript narrows away the
-              // undefined and JSX treats it as a component rather than a tag.
-              const Summary = panel.Summary
-              if (!Summary) return null
-              return (
-                <Summary
-                  key={panel.id}
-                  settings={settings}
-                  onOpen={() => setActiveId(panel.id)}
-                />
-              )
-            })}
-
-          <button
-            type="button"
-            className={`side__link ${showingLicences ? 'side__link--on' : ''}`}
-            onClick={() => setActiveId(showingLicences ? (PANELS[0]?.id ?? '') : LICENCES_ID)}
-          >
-            Fonts &amp; licences
-          </button>
-        </div>
+        <button
+          type="button"
+          className={`side__link ${showingLicences ? 'side__link--on' : ''}`}
+          onClick={() => setActiveId(showingLicences ? HOME_ID : LICENCES_ID)}
+        >
+          Fonts &amp; licences
+        </button>
       </nav>
 
       <main className="panel">
         {showingLicences ? (
           <LicencesPanel />
+        ) : settings && activeId === HOME_ID ? (
+          <DashboardPanel settings={settings} onOpen={setActiveId} />
         ) : !settings || !active ? (
           <p className="loading">Loading…</p>
         ) : (

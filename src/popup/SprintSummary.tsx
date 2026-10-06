@@ -2,15 +2,15 @@ import { formatRange, formatRemaining, sprintFor } from '../shared/sprint'
 import type { SummaryProps } from './panels'
 
 /**
- * The running sprint, pinned to the bottom of the sidebar.
+ * The running sprint, as a card on the Overview screen.
  *
- * It sits here rather than only in the Sprint panel so that the answer costs
- * no clicks at all. Anyone who turned the pill off has no other place to see
- * it, and making them pick a panel every time is the friction the feature was
- * supposed to remove.
+ * It is there so the answer costs opening the extension and nothing more.
+ * Anyone who turned the on-page pill off has no other place to see it, and
+ * making them pick a panel every time is the friction the feature was supposed
+ * to remove.
  *
- * Nothing is shown when the anchor cannot be read — the panel says why, and a
- * broken readout in the chrome of every screen would be worse than none.
+ * Nothing is shown when the anchor cannot be read — the Sprint panel says why,
+ * and a broken card on the landing screen would be worse than none.
  */
 export function SprintSummary({ settings, onOpen }: SummaryProps) {
   const sprint = sprintFor(new Date(), {
@@ -22,14 +22,14 @@ export function SprintSummary({ settings, onOpen }: SummaryProps) {
   return (
     <button
       type="button"
-      className={`side__card ${sprint.daysUntilEnd <= 0 ? 'side__card--warn' : ''}`}
+      className={`card ${sprint.daysUntilEnd <= 0 ? 'card--warn' : ''}`}
       onClick={onOpen}
-      // The dates go here rather than on screen: the sidebar is narrow, and
-      // the number and the deadline are what the glance is for.
-      title={`${formatRange(sprint)} — open the Sprint panel`}
+      title="Open the Sprint panel"
     >
-      <span className="side__card-main">Sprint {sprint.number}</span>
-      <span className="side__card-sub">{formatRemaining(sprint)}</span>
+      <span className="card__main">Sprint {sprint.number}</span>
+      <span className="card__sub">
+        {formatRange(sprint)} · {formatRemaining(sprint)}
+      </span>
     </button>
   )
 }

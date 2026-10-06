@@ -453,30 +453,34 @@ ES modules:
    `PANELS` in `src/popup/panels.ts`. That is the whole popup change — the
    sidebar menu, the active-state dot and the routing all read from that array.
 5. Optional: give the entry a `Summary` component taking `SummaryProps`, and it
-   gains a line on the sidebar dashboard. See below.
+   gains a card on the Overview screen. See below.
 
-## The sidebar dashboard
+## The Overview screen
 
-Under the menu sits a dashboard: whatever the features want read without being
-asked. A panel earns a line there by setting `Summary` on its `PANELS` entry —
-nothing in `App.tsx` or the stylesheet needs editing for a new one to appear,
-and `onOpen` is wired to that feature's own panel so the card is a way in as
-well as a readout.
+Opening the popup lands on **Overview**, a dashboard of whatever the features
+want read without being asked. A panel earns a card there by setting `Summary`
+on its `PANELS` entry — nothing in `App.tsx` or the stylesheet changes for a
+new one to appear — and `onOpen` is wired to that feature's own panel, so a
+card is a way in as well as a readout.
 
-The sprint is the first tenant, and it is why the dashboard exists: the answer
-was already on its panel, but reaching a panel is two clicks every time, and
+It is in the panel area, not the sidebar. The sidebar is the menu, and a
+readout parked there would compete for the same narrow column with every
+feature added later; the panel has room to grow downwards.
+
+The sprint is the first tenant, and is why the screen exists: the answer was
+already on its panel, but reaching a panel is two clicks every time, and
 anyone who turned the on-page pill off had nowhere else to look.
 
 A summary should:
 
 - **Return `null` when it has nothing certain to say.** The sprint shows
-  nothing when its anchor cannot be read — a broken readout fixed to the chrome
-  of every screen is worse than none, and the panel is where the explanation
-  belongs.
-- **Use `.side__card`**, with `.side__card--warn` for the state worth noticing.
-  The sidebar is 200px wide, so it holds a line and a half: a number and a
-  deadline, not a sentence. Anything longer goes in the `title`.
-- **Stay cheap.** It renders on every popup open and on every settings change.
+  nothing when its anchor cannot be read — a broken card on the landing screen
+  is worse than none, and its panel is where the explanation belongs.
+- **Use `.card`**, with `.card--warn` for the state worth noticing, so the
+  screen stays one design rather than a pile of bespoke ones.
+- **Say one thing.** A headline and a line under it. Detail belongs on the
+  panel the card opens.
+- **Stay cheap.** It renders on every popup open and every settings change.
 
 ## Supported hosts
 

@@ -168,50 +168,52 @@ p {
   background: #fff;
 }
 
-/* The dashboard: whatever the panels report, plus the licence link, pinned to
-   the bottom of the sidebar. */
-.side__foot {
-  display: grid;
-  gap: 3px;
-  margin-top: auto;
-  padding-top: 12px;
-}
+/* --- overview cards --- */
 
-.side__card {
+/*
+ * One per feature that has something to report, on the landing screen. They
+ * live in the panel, not the sidebar: the sidebar is the menu, and a readout
+ * wedged in there would compete with every feature added later for the same
+ * narrow column.
+ */
+.card {
   display: grid;
-  gap: 1px;
-  padding: 7px 8px;
+  gap: 2px;
+  width: 100%;
+  padding: 11px 13px;
   border: 1px solid var(--border);
-  border-radius: 8px;
-  background: var(--bg);
+  border-radius: 9px;
+  background: var(--bg-sunken);
   color: inherit;
   font: inherit;
   text-align: left;
   cursor: pointer;
 }
 
-.side__card:hover {
+.card:hover {
   border-color: var(--accent);
   background: var(--accent-soft);
 }
 
-.side__card-main {
-  font-size: 14px;
+.card__main {
+  font-size: 17px;
   font-weight: 700;
+  letter-spacing: -0.01em;
 }
 
-.side__card-sub {
+.card__sub {
   color: var(--text-dim);
-  font-size: 11px;
+  font-size: 12px;
+  font-weight: 500;
 }
 
 /* Something worth noticing — a sprint's closing day, a branch about to lock. */
-.side__card--warn {
+.card--warn {
   border-color: #e0a32e;
   background: #fdf6e7;
 }
 
-.side__card--warn .side__card-main {
+.card--warn .card__main {
   color: #8a5a00;
 }
 
@@ -526,6 +528,7 @@ select {
 /* --- sidebar secondary link + licence list --- */
 
 .side__link {
+  margin-top: auto;
   padding: 8px;
   border: 0;
   border-radius: 7px;

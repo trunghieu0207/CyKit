@@ -15,7 +15,6 @@ import type {
   Settings,
 } from '../shared/types'
 import { LicencesPanel } from './LicencesPanel'
-import { SprintSummary } from './SprintSummary'
 import { PANELS } from './panels'
 
 const LICENCES_ID = 'licences'
@@ -94,8 +93,26 @@ export function App() {
           ))}
         </ul>
 
+        {/*
+         * The dashboard. Every panel that defines a Summary gets a line here,
+         * so a future feature earns one by filling in that field rather than
+         * by editing this file.
+         */}
         <div className="side__foot">
-          <SprintSummary settings={settings} onOpen={() => setActiveId('sprint')} />
+          {settings &&
+            PANELS.map((panel) => {
+              // Bound to a capitalised local so TypeScript narrows away the
+              // undefined and JSX treats it as a component rather than a tag.
+              const Summary = panel.Summary
+              if (!Summary) return null
+              return (
+                <Summary
+                  key={panel.id}
+                  settings={settings}
+                  onOpen={() => setActiveId(panel.id)}
+                />
+              )
+            })}
 
           <button
             type="button"

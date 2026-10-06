@@ -168,7 +168,8 @@ p {
   background: #fff;
 }
 
-/* Pinned to the bottom of the sidebar: the sprint readout and the licence link. */
+/* The dashboard: whatever the panels report, plus the licence link, pinned to
+   the bottom of the sidebar. */
 .side__foot {
   display: grid;
   gap: 3px;
@@ -176,7 +177,7 @@ p {
   padding-top: 12px;
 }
 
-.side__sprint {
+.side__card {
   display: grid;
   gap: 1px;
   padding: 7px 8px;
@@ -189,28 +190,28 @@ p {
   cursor: pointer;
 }
 
-.side__sprint:hover {
+.side__card:hover {
   border-color: var(--accent);
   background: var(--accent-soft);
 }
 
-.side__sprint-no {
+.side__card-main {
   font-size: 14px;
   font-weight: 700;
 }
 
-.side__sprint-when {
+.side__card-sub {
   color: var(--text-dim);
   font-size: 11px;
 }
 
-/* The closing day, marked as the panel and the pill mark it. */
-.side__sprint--last {
+/* Something worth noticing — a sprint's closing day, a branch about to lock. */
+.side__card--warn {
   border-color: #e0a32e;
   background: #fdf6e7;
 }
 
-.side__sprint--last .side__sprint-no {
+.side__card--warn .side__card-main {
   color: #8a5a00;
 }
 

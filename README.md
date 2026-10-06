@@ -93,11 +93,6 @@ week. The team describes it as ending "Tuesday afternoon", but using the end of
 Tuesday means no hours fall between one sprint and the next, so there is never
 a moment with no sprint to show.
 
-The readout appears twice on purpose: once in the sidebar, where it costs no
-clicks at all, and once on the panel beside the settings that change it.
-Anyone who turns the pill off has nowhere else to look, and making them pick a
-panel every time is the friction the feature exists to remove.
-
 The panel's readout sits **outside** its `<fieldset disabled>`, which is the
 whole point of the split: the toggle turns off the pill on the page, not the
 answer. Someone who does not want it following them around still wants to look
@@ -457,6 +452,31 @@ ES modules:
 4. Write `src/popup/<Name>Panel.tsx` taking `PanelProps`, and add one entry to
    `PANELS` in `src/popup/panels.ts`. That is the whole popup change — the
    sidebar menu, the active-state dot and the routing all read from that array.
+5. Optional: give the entry a `Summary` component taking `SummaryProps`, and it
+   gains a line on the sidebar dashboard. See below.
+
+## The sidebar dashboard
+
+Under the menu sits a dashboard: whatever the features want read without being
+asked. A panel earns a line there by setting `Summary` on its `PANELS` entry —
+nothing in `App.tsx` or the stylesheet needs editing for a new one to appear,
+and `onOpen` is wired to that feature's own panel so the card is a way in as
+well as a readout.
+
+The sprint is the first tenant, and it is why the dashboard exists: the answer
+was already on its panel, but reaching a panel is two clicks every time, and
+anyone who turned the on-page pill off had nowhere else to look.
+
+A summary should:
+
+- **Return `null` when it has nothing certain to say.** The sprint shows
+  nothing when its anchor cannot be read — a broken readout fixed to the chrome
+  of every screen is worse than none, and the panel is where the explanation
+  belongs.
+- **Use `.side__card`**, with `.side__card--warn` for the state worth noticing.
+  The sidebar is 200px wide, so it holds a line and a half: a number and a
+  deadline, not a sentence. Anything longer goes in the `title`.
+- **Stay cheap.** It renders on every popup open and on every settings change.
 
 ## Supported hosts
 

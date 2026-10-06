@@ -15,6 +15,7 @@ import type {
   Settings,
 } from '../shared/types'
 import { LicencesPanel } from './LicencesPanel'
+import { SprintSummary } from './SprintSummary'
 import { PANELS } from './panels'
 
 const LICENCES_ID = 'licences'
@@ -93,13 +94,17 @@ export function App() {
           ))}
         </ul>
 
-        <button
-          type="button"
-          className={`side__link ${showingLicences ? 'side__link--on' : ''}`}
-          onClick={() => setActiveId(showingLicences ? (PANELS[0]?.id ?? '') : LICENCES_ID)}
-        >
-          Fonts &amp; licences
-        </button>
+        <div className="side__foot">
+          <SprintSummary settings={settings} onOpen={() => setActiveId('sprint')} />
+
+          <button
+            type="button"
+            className={`side__link ${showingLicences ? 'side__link--on' : ''}`}
+            onClick={() => setActiveId(showingLicences ? (PANELS[0]?.id ?? '') : LICENCES_ID)}
+          >
+            Fonts &amp; licences
+          </button>
+        </div>
       </nav>
 
       <main className="panel">

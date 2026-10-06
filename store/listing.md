@@ -58,7 +58,7 @@ A READABLE INTERFACE ON KINTONE AND GAROON
 
 THE SPRINT YOU ARE IN
 
-• The extension's own panel always shows the sprint number, its dates, and when it ends.
+• Open the extension and the sprint is already there, in the sidebar: the number and when it ends, whichever panel you are on.
 • Want it on the page too? Turn on a small pill in the corner of kintone and Garoon. It is off until you ask for it.
 • One-week sprints running Wednesday to Tuesday. Set the anchor once and the number keeps itself right — there is no list to maintain.
 • It says “ends tomorrow” and “ends today” rather than counting days, so there is nothing to misread, and the closing day is marked.
@@ -159,9 +159,10 @@ They are all true: the extension collects no user data at all.
 
 ## What changed in 0.3.0
 
-- **New feature: the current sprint.** The popup always shows it; a pill in a
-  corner of kintone and Garoon is off until you turn it on, and is switchable
-  per product like the font feature.
+- **New feature: the current sprint.** It sits in the popup's sidebar, so
+  opening the extension is enough to see it; a pill in a corner of kintone and
+  Garoon is off until you turn it on, and is switchable per product like the
+  font feature.
 - **No new permissions.** It reads nothing from the page and makes no network
   request; the number is arithmetic on an anchor date stored in settings.
 - **Branch locks: three fixes, all of which made it stay silent.** It now reads

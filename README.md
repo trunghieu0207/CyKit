@@ -12,9 +12,9 @@ is closed for merging, reading the windows from a Garoon group calendar.
 **Feature 3 — GitHub.** Adds a Copy button to pull request and issue pages that
 puts the title, the canonical link, or both on the clipboard.
 
-**Feature 4 — Sprint.** Shows which sprint is running, in the extension's own
-panel. Turn it on to also get a small pill in a corner of kintone and Garoon.
-Sprints are one week, Wednesday to Tuesday.
+**Feature 4 — Sprint.** Shows which sprint is running, in the popup's sidebar
+and on its own panel. Turn it on to also get a small pill in a corner of
+kintone and Garoon. Sprints are one week, Wednesday to Tuesday.
 
 ## Setup
 
@@ -92,6 +92,11 @@ The sprint runs Wednesday 00:00 to the following Wednesday 00:00 — a half-open
 week. The team describes it as ending "Tuesday afternoon", but using the end of
 Tuesday means no hours fall between one sprint and the next, so there is never
 a moment with no sprint to show.
+
+The readout appears twice on purpose: once in the sidebar, where it costs no
+clicks at all, and once on the panel beside the settings that change it.
+Anyone who turns the pill off has nowhere else to look, and making them pick a
+panel every time is the friction the feature exists to remove.
 
 The panel's readout sits **outside** its `<fieldset disabled>`, which is the
 whole point of the split: the toggle turns off the pill on the page, not the

@@ -168,11 +168,50 @@ p {
   background: #fff;
 }
 
+/* Pinned to the bottom of the sidebar: the sprint readout and the licence link. */
 .side__foot {
+  display: grid;
+  gap: 3px;
   margin-top: auto;
-  padding: 14px 8px 2px;
+  padding-top: 12px;
+}
+
+.side__sprint {
+  display: grid;
+  gap: 1px;
+  padding: 7px 8px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--bg);
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.side__sprint:hover {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+}
+
+.side__sprint-no {
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.side__sprint-when {
   color: var(--text-dim);
   font-size: 11px;
+}
+
+/* The closing day, marked as the panel and the pill mark it. */
+.side__sprint--last {
+  border-color: #e0a32e;
+  background: #fdf6e7;
+}
+
+.side__sprint--last .side__sprint-no {
+  color: #8a5a00;
 }
 
 /* --- scope checkboxes --- */
@@ -486,7 +525,6 @@ select {
 /* --- sidebar secondary link + licence list --- */
 
 .side__link {
-  margin-top: auto;
   padding: 8px;
   border: 0;
   border-radius: 7px;

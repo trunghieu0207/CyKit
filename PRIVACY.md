@@ -1,6 +1,6 @@
 # Privacy Policy — CyKit Extension
 
-_Last updated: 2026-10-05_
+_Last updated: 2026-10-26_
 
 **CyKit does not collect, transmit, or sell any data.** It has no analytics, no
 telemetry, no accounts, and no server of its own.
@@ -31,6 +31,12 @@ the popup. The popup always shows it; the pill on kintone and Garoon pages is
 **off by default** and you turn it on if you want it. Either way it reads
 nothing from the page and makes no network request — it is arithmetic on your
 own clock.
+
+**Link peek feature.** Also **off by default**. When on, it reads the address
+of a link you click so it can open that page over the current one, or in a
+small window when the site refuses to be framed. It reads nothing else from
+the page, stores nothing, and sends nothing anywhere — the page it opens is
+fetched by your browser exactly as clicking the link normally would.
 
 **Branch locks feature.** Also **off by default**, and additionally gated on a
 permission you grant by hand.

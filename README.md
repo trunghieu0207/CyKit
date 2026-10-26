@@ -12,6 +12,9 @@ is closed for merging, reading the windows from a Garoon group calendar.
 **Feature 3 — GitHub.** Adds a Copy button to pull request and issue pages that
 puts the title, the canonical link, or both on the clipboard.
 
+**Feature 5 — Link peek** (experimental). Clicking a link opens it over the
+page instead of replacing it, so you keep your place.
+
 **Feature 4 — Sprint.** Shows which sprint is running, in the popup's sidebar
 and on its own panel. Turn it on to also get a small pill in a corner of
 kintone and Garoon. Sprints are one week, Wednesday to Tuesday.
@@ -65,6 +68,38 @@ moment ago clean itself up.
 
 Because `all_frames` is on, each frame is judged by its own path. Plugin iframes
 under `/k/plugin/…` therefore stay in kintone's scope.
+
+## How link peek works
+
+`src/content/features/link-peek.ts` opens a link without leaving the page, the
+habit Arc's little windows build. It needs two mechanisms because no single
+one covers both cases:
+
+- **Same origin** is framed in an overlay. kintone serves
+  `X-Frame-Options: SAMEORIGIN`, which permits exactly that.
+- **Anything else** gets a real window via `window.open`. Cross-origin framing
+  is refused outright — GitHub answers `x-frame-options: deny` and
+  `frame-ancestors 'none'` — and no extension can override a response header.
+  Arc can overlay anything because it *is* the browser and renders the page in
+  its own view; an extension is a guest of the page it runs on.
+
+The risky part is not the overlay, it is **taking over a click on someone
+else's page**. Three things keep that honest:
+
+- **Bubble phase, not capture.** kintone runs its own router. By the time a
+  click reaches this handler, anything the page meant to handle has already
+  called `preventDefault` or stopped propagation, so only the clicks nobody
+  else wanted are left. `isPlainClick` then rejects the rest: modified clicks
+  (which mean "new tab", "new window", "download" by convention), non-left
+  buttons, `target`, and `download`.
+- **Only plain http(s) URLs.** `mailto:`, `javascript:`, extension URLs and
+  same-page `#anchor` links are not navigations to preview.
+- **Top frame only.** Otherwise a peek inside a peek is one click away.
+
+A frame can still fail for reasons the URL does not reveal — a path with its
+own stricter CSP, a login redirect elsewhere — so a timeout turns the dead
+frame into an offer to open the page in a window. Showing nothing would leave
+the click looking broken, which is worse than admitting it.
 
 ## How the sprint feature works
 

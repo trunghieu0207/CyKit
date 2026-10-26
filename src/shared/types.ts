@@ -108,9 +108,22 @@ export interface SprintSettings {
   anchorStart: string
 }
 
+/**
+ * Opening a link without leaving the page. Experimental: it takes over clicks
+ * on a host page that runs its own router.
+ */
+export interface LinkPeekSettings {
+  enabled: boolean
+  /** Which products this feature acts on. */
+  scope: Scope
+  /** Open links to other sites in a small window; they cannot be framed. */
+  external: boolean
+}
+
 export interface Settings {
   font: FontSettings
   github: GithubSettings
   branchLock: BranchLockSettings
   sprint: SprintSettings
+  linkPeek: LinkPeekSettings
 }

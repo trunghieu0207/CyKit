@@ -6,12 +6,14 @@ import {
   patchGithubSettings,
   patchBranchLockSettings,
   patchSprintSettings,
+  patchLinkPeekSettings,
 } from '../shared/storage'
 import type {
   BranchLockSettings,
   FontSettings,
   GithubSettings,
   SprintSettings,
+  LinkPeekSettings,
   Settings,
 } from '../shared/types'
 import { DashboardPanel } from './DashboardPanel'
@@ -56,6 +58,11 @@ export function App() {
   const patchSprint = (patch: Partial<SprintSettings>) => {
     setSettings((prev) => (prev ? { ...prev, sprint: { ...prev.sprint, ...patch } } : prev))
     void patchSprintSettings(patch)
+  }
+
+  const patchLinkPeek = (patch: Partial<LinkPeekSettings>) => {
+    setSettings((prev) => (prev ? { ...prev, linkPeek: { ...prev.linkPeek, ...patch } } : prev))
+    void patchLinkPeekSettings(patch)
   }
 
   const active = PANELS.find((panel) => panel.id === activeId) ?? PANELS[0]
@@ -138,6 +145,7 @@ export function App() {
             patchGithub={patchGithub}
             patchBranchLock={patchBranchLock}
             patchSprint={patchSprint}
+            patchLinkPeek={patchLinkPeek}
           />
         )}
       </main>

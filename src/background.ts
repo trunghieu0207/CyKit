@@ -1,17 +1,12 @@
 import { eventsUrl } from './shared/garoon'
 
 /**
- * Fetches Garoon data on behalf of content scripts that cannot do it
- * themselves.
+ * Fetches Garoon events for the content script on github.com, which is bound
+ * by the page's origin and cannot make cross-origin requests even with host
+ * permissions. The service worker can.
  *
- * A content script on github.com is bound by the page's origin — Chrome is
- * explicit that "cross-origin requests are always treated as such in content
- * scripts, even if the extension has host permissions". Only an extension
- * service worker can reach another host, and only with host permissions.
- *
- * Those permissions are declared as `optional_host_permissions` and requested
- * from the popup, so installing or updating the extension never presents a new
- * warning and never disables it for people who do not use this feature.
+ * Host access is an `optional_host_permissions` grant requested from the
+ * popup, so installs and updates never show a new permission warning.
  */
 
 export interface LockRequest {
@@ -42,8 +37,7 @@ async function handle(request: LockRequest): Promise<LockResponse> {
     return { ok: false, reason: 'bad-request' }
   }
 
-  // Asking rather than assuming: the user may never have granted it, or may
-  // have revoked it from chrome://extensions since.
+  // Never granted, or revoked since from chrome://extensions.
   const granted = await chrome.permissions.contains({
     origins: [originPattern(request.origin)],
   })
@@ -57,8 +51,7 @@ async function handle(request: LockRequest): Promise<LockResponse> {
   try {
     const res = await fetch(url.toString(), {
       headers: { 'X-Requested-With': 'XMLHttpRequest' },
-      // Required for a cross-origin request to carry the Garoon session
-      // cookie. Without it the API answers as if signed out.
+      // Sends the Garoon session cookie; without it the API sees a signed-out user.
       credentials: 'include',
     })
     if (res.status === 401 || res.status === 403) {
@@ -73,7 +66,7 @@ async function handle(request: LockRequest): Promise<LockResponse> {
 
 chrome.runtime.onMessage.addListener((message: unknown, _sender, sendResponse) => {
   if ((message as LockRequest)?.type !== 'garoon-events') return undefined
-  // Returning true keeps the channel open for the async reply.
+  // Keep the channel open for the async reply.
   void handle(message as LockRequest).then(sendResponse)
   return true
 })

@@ -4,7 +4,6 @@ import type {
   GithubSettings,
   BranchLockSettings,
   SprintSettings,
-  LinkPeekSettings,
   Settings,
 } from '../shared/types'
 import { FontPanel } from './FontPanel'
@@ -12,7 +11,6 @@ import { GithubPanel } from './GithubPanel'
 import { BranchLockPanel } from './BranchLockPanel'
 import { SprintPanel } from './SprintPanel'
 import { SprintSummary } from './SprintSummary'
-import { LinkPeekPanel } from './LinkPeekPanel'
 
 export interface PanelProps {
   settings: Settings
@@ -20,7 +18,6 @@ export interface PanelProps {
   patchGithub: (patch: Partial<GithubSettings>) => void
   patchBranchLock: (patch: Partial<BranchLockSettings>) => void
   patchSprint: (patch: Partial<SprintSettings>) => void
-  patchLinkPeek: (patch: Partial<LinkPeekSettings>) => void
 }
 
 /**
@@ -86,14 +83,6 @@ export const PANELS: readonly PanelEntry[] = [
     isOn: (s) => s.sprint.enabled,
     Component: SprintPanel,
     Summary: SprintSummary,
-  },
-  {
-    id: 'link-peek',
-    label: 'Link peek',
-    hint: 'Open without leaving',
-    glyph: '\u29C9',
-    isOn: (s) => s.linkPeek.enabled,
-    Component: LinkPeekPanel,
   },
   {
     id: 'branch-lock',

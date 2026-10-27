@@ -41,13 +41,6 @@ export const DEFAULT_SETTINGS: Settings = {
     anchorNumber: DEFAULT_ANCHOR.number,
     anchorStart: DEFAULT_ANCHOR.start,
   },
-  linkPeek: {
-    // Experimental, and it intercepts clicks on someone else's page, so it
-    // stays off until asked for. kintone only to begin with.
-    enabled: false,
-    scope: { kintone: true, garoon: false, other: false },
-    external: true,
-  },
 }
 
 /** Shallow-merges stored values over defaults, one level per feature. */
@@ -67,11 +60,6 @@ function withDefaults(stored: unknown): Settings {
       ...DEFAULT_SETTINGS.sprint,
       ...raw.sprint,
       scope: { ...DEFAULT_SETTINGS.sprint.scope, ...raw.sprint?.scope },
-    },
-    linkPeek: {
-      ...DEFAULT_SETTINGS.linkPeek,
-      ...raw.linkPeek,
-      scope: { ...DEFAULT_SETTINGS.linkPeek.scope, ...raw.linkPeek?.scope },
     },
   }
 }
@@ -113,15 +101,6 @@ export async function patchSprintSettings(
 ): Promise<Settings> {
   const current = await getSettings()
   const next: Settings = { ...current, sprint: { ...current.sprint, ...patch } }
-  await chrome.storage.sync.set({ [KEY]: next })
-  return next
-}
-
-export async function patchLinkPeekSettings(
-  patch: Partial<Settings['linkPeek']>,
-): Promise<Settings> {
-  const current = await getSettings()
-  const next: Settings = { ...current, linkPeek: { ...current.linkPeek, ...patch } }
   await chrome.storage.sync.set({ [KEY]: next })
   return next
 }
